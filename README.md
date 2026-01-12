@@ -2,7 +2,7 @@
 
 > AI-assisted radiology research paper writing with multi-model review system
 
-영상의학 연구 논문 작성 및 교정을 위한 Claude Code 스킬입니다. 세 가지 AI 모델이 협업하여 학술 논문의 초안 작성부터 방법론 검토, 문체 교정까지 체계적으로 지원합니다.
+영상의학 연구 논문 작성 및 교정을 위한 Claude Code 스킬입니다. 네 가지 AI 모델이 협업하여 학술 논문의 문헌 리서치, 초안 작성, 방법론 검토, 문체 교정까지 체계적으로 지원합니다.
 
 ---
 
@@ -18,7 +18,7 @@
 
 ### The Solution
 
-**Multi-Model Review System**: 각 모델이 전문 분야에 집중
+**Multi-Model System**: 각 모델이 전문 분야에 집중
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -26,17 +26,17 @@
 │         초안 작성 · 피드백 통합 · 수정 · 버전 관리            │
 └─────────────────────────────────────────────────────────────┘
                               │
-              ┌───────────────┴───────────────┐
-              ▼                               ▼
-┌─────────────────────────┐     ┌─────────────────────────┐
-│  GPT-5.2 (reasoning: high)  │     │    Gemini 3.0 Pro       │
-│    Technical Reviewer    │     │     Style Reviewer      │
-├─────────────────────────┤     ├─────────────────────────┤
-│ • 연구 설계 검증         │     │ • 문장 자연스러움        │
-│ • 통계 분석 적절성       │     │ • 가독성 향상           │
-│ • 논리적 일관성          │     │ • 저널 스타일 준수       │
-│ • 방법론 체크리스트      │     │ • Clarity 개선          │
-└─────────────────────────┘     └─────────────────────────┘
+       ┌──────────────────────┼──────────────────────┐
+       ▼                      ▼                      ▼
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│ GPT-5.2          │  │ Gemini 3.0 Pro   │  │ Gemini 3 Pro     │
+│ (reasoning: high)│  │ Style Reviewer   │  │ Lit. Researcher  │
+├──────────────────┤  ├──────────────────┤  ├──────────────────┤
+│ • 연구 설계 검증 │  │ • 문장 자연스러움│  │ • 문헌 검토      │
+│ • 통계 분석      │  │ • 가독성 향상    │  │ • Gap 분석       │
+│ • 논리적 일관성  │  │ • 저널 스타일    │  │ • 인용 제안      │
+│ • 방법론 체크    │  │ • Clarity 개선   │  │ • 배경 연구      │
+└──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
 ---
@@ -66,6 +66,7 @@
 
 ### Key Capabilities
 
+- **Literature Research**: Gemini 3 Pro를 활용한 자동 문헌 검토 및 gap 분석
 - **Checklist Compliance**: STARD, TRIPOD, CLAIM 자동 검증
 - **Number Consistency**: Abstract-Results-Tables 수치 일치 확인
 - **Overclaim Detection**: "first", "novel", "superior" 등 과장 표현 감지
@@ -93,6 +94,52 @@
 2. 섹션 템플릿 및 저널 프로파일 로드
 3. 초안 생성
 4. (선택) 즉시 리뷰 실행
+
+### `/radiology-intro [topic]`
+
+문헌 기반 Introduction 섹션을 작성합니다.
+
+```
+/radiology-intro "Deep learning for liver metastasis detection on CT"
+
+> Keywords: liver metastasis, CT, deep learning, diagnostic accuracy
+> Study type: diagnostic_accuracy
+> Target journal: Radiology
+```
+
+**Literature Research Workflow:**
+```
+Research Topic + Keywords
+          │
+          ▼
+┌─────────────────────────┐
+│ Gemini 3 Pro            │
+│ Literature Analysis     │
+├─────────────────────────┤
+│ • Clinical context      │
+│ • Key literature        │
+│ • Knowledge gaps        │
+│ • Citation suggestions  │
+└─────────────────────────┘
+          │
+          ▼
+┌─────────────────────────┐
+│ Claude                  │
+│ Introduction Draft      │
+├─────────────────────────┤
+│ P1: Clinical Context    │
+│ P2: Gap/Limitation      │
+│ P3: Objective           │
+└─────────────────────────┘
+          │
+          ▼
+┌─────────────────────────┐
+│ Dual Review (Optional)  │
+├─────────────────────────┤
+│ GPT-5.2: Gap alignment  │
+│ Gemini: Flow, clarity   │
+└─────────────────────────┘
+```
 
 ### `/radiology-review [section]`
 
@@ -214,10 +261,11 @@ claude-code
 
 ### Model Configuration
 
-| Model | CLI | Parameters |
-|-------|-----|------------|
-| GPT-5.2 | Codex | `--sandbox read-only --reasoning high` |
-| Gemini 3.0 Pro | Gemini | `-y` (auto-approve) |
+| Model | CLI | Parameters | Purpose |
+|-------|-----|------------|---------|
+| GPT-5.2 | Codex | `--sandbox read-only --reasoning high` | Technical Review |
+| Gemini 3.0 Pro | Gemini | `-y` (auto-approve) | Style Review |
+| Gemini 3 Pro | Gemini | `-m gemini-3-pro -y` | Literature Research |
 
 ### Execution Commands
 
@@ -227,6 +275,9 @@ codex exec -m gpt-5.2 --sandbox read-only --reasoning high "[prompt]"
 
 # Gemini Style Review
 gemini -y "[prompt]"
+
+# Gemini 3 Pro Literature Research
+gemini -m gemini-3-pro -y "[research prompt]"
 ```
 
 ### Error Handling

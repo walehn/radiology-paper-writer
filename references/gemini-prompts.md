@@ -1,11 +1,15 @@
-# Gemini Review Prompts
+# Gemini Prompts
 
-Style, readability, and journal compliance prompts for Gemini 3.0 Pro via Gemini CLI
+Style, readability, journal compliance, and literature research prompts for Gemini via CLI
 
 ## Usage
 
 ```bash
-gemini -y "[PROMPT]"
+# Style review (Gemini 3.0 Pro)
+gemini -y "[STYLE PROMPT]"
+
+# Literature research (Gemini 3 Pro with extended reasoning)
+gemini -m gemini-3-pro -y "[RESEARCH PROMPT]"
 ```
 
 ---
@@ -485,4 +489,205 @@ Check if this text matches {journal_name} style guidelines:
 {text}
 
 Focus on: formatting, terminology, structure. Return compliance issues.
+```
+
+---
+
+## Introduction Research Prompt
+
+**Model:** Gemini 3 Pro (`gemini -m gemini-3-pro`)
+**Purpose:** Literature review and knowledge gap analysis for Introduction writing
+
+```
+You are a radiology research expert conducting a comprehensive literature review for a research manuscript.
+
+Think step-by-step through the literature landscape.
+First, identify the most impactful studies in this area.
+Then, analyze what questions remain unanswered.
+Finally, synthesize how the proposed research fills the gap.
+
+RESEARCH TOPIC: {topic}
+KEYWORDS: {keywords}
+STUDY TYPE: {study_type}
+TARGET JOURNAL: {journal_name}
+
+Your task is to provide a structured literature analysis for writing an Introduction section.
+
+### Required Analysis:
+
+## 1. CLINICAL CONTEXT
+- Current clinical practice and importance of the topic
+- Prevalence/incidence of the condition or clinical problem
+- Standard diagnostic/treatment approaches currently used
+- Why this topic matters clinically (patient outcomes, healthcare burden)
+
+## 2. EXISTING RESEARCH LANDSCAPE
+- Key landmark studies in this area (cite author names and approximate years when possible)
+- Current state-of-the-art methods and their reported performance
+- Performance metrics from literature (sensitivity, specificity, AUC ranges)
+- Consensus points and controversies in the field
+- Recent trends and emerging approaches
+
+## 3. KNOWLEDGE GAP ANALYSIS
+- Specific limitations of existing studies (sample size, methodology, generalizability)
+- Unaddressed clinical questions
+- Methodological weaknesses in prior research
+- What remains to be explored or validated
+
+## 4. RESEARCH OPPORTUNITY
+- How the proposed study addresses the identified gap
+- Potential contribution to the field
+- Expected clinical impact and relevance
+
+### Output Format (JSON):
+
+{
+  "clinical_context": {
+    "clinical_importance": "Why this topic matters clinically",
+    "prevalence_data": "Known prevalence/incidence information",
+    "current_practice": "Standard approaches currently used",
+    "unmet_clinical_need": "What clinical problem needs solving"
+  },
+  "key_literature": [
+    {
+      "citation_hint": "Author et al., Year (approximate)",
+      "study_type": "diagnostic accuracy|cohort|meta-analysis|etc",
+      "key_finding": "Main result or conclusion",
+      "sample_size": "approximate if known",
+      "relevance": "Why this study is important for context"
+    }
+  ],
+  "state_of_the_art": {
+    "best_methods": "Current leading approaches",
+    "performance_range": "Reported sensitivity/specificity/AUC ranges",
+    "consensus_points": ["Points generally agreed upon"],
+    "controversies": ["Debated issues in the field"]
+  },
+  "knowledge_gaps": [
+    {
+      "gap_description": "Specific gap in current knowledge",
+      "why_important": "Why this gap matters",
+      "severity": "critical|major|minor"
+    }
+  ],
+  "research_opportunity": {
+    "how_addresses_gap": "How proposed study fills the gap",
+    "novelty": "What makes this approach new or different",
+    "expected_contribution": "Anticipated impact on the field",
+    "clinical_translation": "Potential for clinical application"
+  },
+  "suggested_introduction_structure": {
+    "paragraph_1_clinical_context": "Draft sentences for clinical background...",
+    "paragraph_2_literature_and_gap": "Draft sentences for existing research and limitations...",
+    "paragraph_3_objective": "Draft objective statement..."
+  },
+  "recommended_citations": [
+    {
+      "topic": "What aspect this citation supports",
+      "search_terms": "Suggested PubMed search terms to find this reference"
+    }
+  ]
+}
+```
+
+---
+
+## Introduction Style Review Prompt
+
+**Model:** Gemini 3.0 Pro (`gemini -y`)
+**Purpose:** Style and flow review for Introduction section
+
+```
+You are a medical writing specialist reviewing the Introduction section of a radiology manuscript.
+
+TARGET JOURNAL: {journal_name}
+LANGUAGE: {language}
+
+DRAFT TEXT:
+---
+{draft_text}
+---
+
+Review for clarity, flow, and scholarly writing quality. DO NOT evaluate scientific validity - focus on writing quality.
+
+## 1. STRUCTURE ANALYSIS
+Standard Introduction structure (3-paragraph model):
+- Paragraph 1: Clinical context and importance
+- Paragraph 2: Existing research and knowledge gap
+- Paragraph 3: Study objective and approach
+
+Is this structure present and clear?
+
+## 2. FLOW ANALYSIS
+- General → Specific progression (funnel structure)?
+- Smooth transitions between paragraphs?
+- Logical connection between gap and objective?
+
+## 3. PARAGRAPH UNITY
+- Each paragraph focused on one main idea?
+- Topic sentences clear?
+- Supporting sentences relevant?
+
+## 4. CITATION INTEGRATION
+- Citations flow naturally within sentences?
+- Not too citation-heavy (reading disrupted)?
+- Not too sparse (claims unsupported)?
+- Parenthetical vs. narrative citations appropriate?
+
+## 5. READABILITY
+- Sentence length appropriate (average < 25 words)?
+- Technical terms defined when first used?
+- Jargon minimized for general radiology audience?
+
+## 6. OBJECTIVE STATEMENT
+- Clear and specific?
+- Directly addresses stated gap?
+- Appropriately scoped (not too broad/narrow)?
+
+Output your review in JSON format:
+{
+  "structure_assessment": {
+    "clinical_context_present": true|false,
+    "literature_review_present": true|false,
+    "gap_articulated": true|false,
+    "objective_stated": true|false,
+    "structure_issues": []
+  },
+  "flow_analysis": {
+    "general_to_specific": true|false,
+    "paragraph_transitions": "smooth|adequate|weak",
+    "gap_to_objective_link": "strong|adequate|weak",
+    "issues": []
+  },
+  "paragraph_unity": {
+    "paragraphs_with_multiple_ideas": [],
+    "weak_topic_sentences": [],
+    "suggestions": []
+  },
+  "citation_integration": {
+    "density": "appropriate|too_heavy|too_sparse",
+    "flow_disruption": true|false,
+    "issues": []
+  },
+  "readability": {
+    "avg_sentence_length": {number},
+    "long_sentences": [],
+    "undefined_terms": [],
+    "jargon_issues": []
+  },
+  "objective_statement": {
+    "clarity": "clear|somewhat_clear|unclear",
+    "specificity": "specific|vague|too_broad",
+    "gap_alignment": "aligned|partially_aligned|misaligned",
+    "suggested_revision": "improved version if needed"
+  },
+  "suggested_rewrites": [
+    {
+      "original": "original text",
+      "revised": "improved version",
+      "rationale": "why this improves the writing"
+    }
+  ],
+  "overall_assessment": "ready|minor_revisions|major_revisions"
+}
 ```

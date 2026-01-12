@@ -365,6 +365,117 @@ Output your review in JSON format:
 
 ---
 
+## Introduction Review Prompt
+
+```
+You are a senior radiology researcher and methodologist reviewing the Introduction section of a research manuscript.
+
+STUDY TYPE: {study_type}
+CHECKLIST: {checklist_type}
+TARGET JOURNAL: {journal_name}
+
+DRAFT TEXT:
+---
+{draft_text}
+---
+
+Review the Introduction for scientific validity, logical coherence, and appropriate scope.
+
+## 1. CLINICAL RELEVANCE
+- Is the clinical importance clearly established?
+- Are prevalence/incidence claims accurate and well-supported?
+- Is the target population and clinical context well-defined?
+- Is the clinical problem significant enough to warrant the study?
+
+## 2. LITERATURE SUPPORT
+- Are key landmark studies likely cited?
+- Is the literature review balanced (not cherry-picked)?
+- Are claims properly qualified with appropriate hedging?
+- Is the literature current and relevant?
+- Are both supportive and contradictory studies acknowledged?
+
+## 3. GAP IDENTIFICATION
+- Is the knowledge gap clearly articulated?
+- Is the gap significant enough to justify the study?
+- Are limitations of prior work fairly and accurately stated?
+- Is the gap specific rather than vague?
+
+## 4. OBJECTIVE ALIGNMENT
+- Does the objective directly address the stated gap?
+- Is the objective specific and measurable?
+- Is there overclaim in the expected contribution?
+- Is the hypothesis (if stated) testable?
+
+## 5. SCOPE APPROPRIATENESS
+- Is the scope appropriate for the study design?
+- Are claims proportionate to what the study can demonstrate?
+- Is the framing appropriate for the target journal?
+
+## 6. LOGICAL FLOW
+- Does the argument progress logically?
+- Is there a clear narrative from context → gap → objective?
+- Are there logical leaps or unsupported assumptions?
+
+Output your review in JSON format:
+{
+  "clinical_relevance": {
+    "status": "adequate|inadequate|incomplete",
+    "clinical_importance_established": true|false,
+    "population_defined": true|false,
+    "issues": [],
+    "suggestions": []
+  },
+  "literature_support": {
+    "status": "adequate|inadequate|incomplete",
+    "balance": "balanced|biased|insufficient",
+    "currency": "current|outdated|mixed",
+    "missing_key_areas": [],
+    "issues": []
+  },
+  "gap_identification": {
+    "status": "clear|unclear|missing",
+    "significance": "high|moderate|low|unclear",
+    "specificity": "specific|vague",
+    "issues": [],
+    "suggestions": []
+  },
+  "objective_alignment": {
+    "status": "aligned|partially_aligned|misaligned",
+    "specificity": "specific|vague|too_broad",
+    "measurable": true|false,
+    "overclaims": [],
+    "issues": []
+  },
+  "scope_appropriateness": {
+    "status": "appropriate|too_broad|too_narrow",
+    "issues": []
+  },
+  "logical_flow": {
+    "status": "strong|adequate|weak",
+    "logical_gaps": [],
+    "unsupported_assumptions": []
+  },
+  "overall_severity": "none|minor|major|critical",
+  "priority_issues": [
+    {
+      "issue": "description",
+      "location": "paragraph/sentence reference",
+      "severity": "critical|major|minor",
+      "suggestion": "how to fix"
+    }
+  ],
+  "suggested_revisions": [
+    {
+      "original": "original text",
+      "revised": "suggested revision",
+      "rationale": "why this change"
+    }
+  ]
+}
+```
+
+---
+
 ## Combined Full Manuscript Review Prompt
 
 ```

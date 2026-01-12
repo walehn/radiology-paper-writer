@@ -1,6 +1,6 @@
 ---
 name: radiology-paper-writer
-description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.2 (reasoning: high) reviews methodology, Gemini reviews style. Supports STARD/TRIPOD/CLAIM checklists. Triggers on /radiology-draft, /radiology-review, /radiology-revise commands.
+description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.2 (reasoning: high) reviews methodology, Gemini reviews style, Gemini 3 Pro conducts literature research. Supports STARD/TRIPOD/CLAIM checklists. Triggers on /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands.
 ---
 
 # Radiology Paper Writer
@@ -14,6 +14,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 | **Claude Code** | Main Editor | 초안 작성, 피드백 통합, 수정, 버전 관리 |
 | **GPT-5.2 (reasoning: high)** | Technical Reviewer | 연구 설계, 통계, 논리 일관성, 방법론 |
 | **Gemini 3.0 Pro** | Style Reviewer | 문장 자연스러움, 가독성, 저널 스타일, clarity |
+| **Gemini 3 Pro** | Literature Researcher | 문헌 검토, knowledge gap 분석, 인용 제안 |
 
 ## Supported Study Types
 
@@ -67,6 +68,60 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 > Study type: diagnostic_accuracy
 > Target journal: Radiology
 > Key findings: AUC 0.92, sensitivity 92.5%, specificity 92.2%
+```
+
+### /radiology-intro [topic]
+
+문헌 기반 Introduction 섹션을 작성합니다. Gemini 3 Pro를 활용하여 관련 문헌을 검토하고 3-paragraph 구조의 Introduction을 생성합니다.
+
+**Workflow:**
+
+1. **Context Gathering** - AskUserQuestion으로 필수 정보 수집
+   - Research topic (연구 주제)
+   - Keywords (핵심 키워드 목록)
+   - Study type (diagnostic_accuracy, prognostic, segmentation_ai, etc.)
+   - Target journal
+   - Language (en/ko)
+
+2. **Literature Research** - Gemini 3 Pro 문헌 분석
+   ```bash
+   gemini -m gemini-3-pro -y "[research prompt from references/gemini-prompts.md]"
+   ```
+
+   Output includes:
+   - Clinical context analysis
+   - Key literature with citation hints
+   - Knowledge gap identification
+   - Research opportunity synthesis
+   - Suggested paragraph drafts
+
+3. **Introduction Draft Generation** - Claude synthesizes research output
+   - Generate 3-paragraph structure:
+     - P1: Clinical Context (임상적 배경)
+     - P2: Gap/Limitation (기존 연구 한계)
+     - P3: Objective (연구 목적)
+   - Integrate literature findings and citation suggestions
+
+4. **Optional Dual Review** - Ask user if they want immediate review
+   - GPT-5.2: Clinical relevance, gap clarity, objective alignment
+   - Gemini: Flow, readability, citation integration
+
+**Example:**
+```
+/radiology-intro "Deep learning for liver metastasis detection on CT"
+
+> Keywords: liver metastasis, CT, deep learning, diagnostic accuracy
+> Study type: diagnostic_accuracy
+> Target journal: Radiology
+> Language: en
+
+Researching with:
+- Gemini 3 Pro: Literature analysis, knowledge gap identification
+
+Generating Introduction:
+- Paragraph 1: Clinical importance of liver metastasis detection
+- Paragraph 2: Current AI approaches and their limitations
+- Paragraph 3: Study objective addressing the gap
 ```
 
 ### /radiology-review [section]
@@ -136,6 +191,17 @@ Reviewing with:
 | Overclaim detection | Clinical readability |
 | Primary endpoint clarity | Word count compliance |
 | Statistical formatting | Active voice preference |
+
+### Introduction
+
+| GPT-5.2 (Technical) | Gemini (Style) |
+|---------------------|----------------|
+| Clinical relevance established | General → Specific flow |
+| Literature balance (not cherry-picked) | Paragraph unity |
+| Gap clarity and significance | Transition sentences |
+| Gap-objective alignment | Citation integration |
+| Overclaim detection | Readability |
+| Scope appropriateness | Objective statement clarity |
 
 ### Methods
 
@@ -228,11 +294,14 @@ codex exec resume --last "[follow-up prompt]"
 ### Gemini Execution
 
 ```bash
-# Auto-approve mode (non-interactive)
+# Style review (Gemini 3.0 Pro, auto-approve mode)
 gemini -y "[prompt]"
 
 # With JSON output preference
 gemini -y "[prompt requesting JSON output]"
+
+# Literature research (Gemini 3 Pro with extended reasoning)
+gemini -m gemini-3-pro -y "[research prompt]"
 ```
 
 ---
