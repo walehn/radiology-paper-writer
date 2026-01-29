@@ -263,7 +263,7 @@ claude-code
 
 | Model | CLI | Parameters | Purpose |
 |-------|-----|------------|---------|
-| GPT-5.2 | Codex | `--sandbox read-only --reasoning high` | Technical Review |
+| GPT-5.2 | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Technical Review |
 | Gemini 3.0 Pro | Gemini | `-y` (auto-approve) | Style Review |
 | Gemini 3 Pro | Gemini | `-m gemini-3-pro -y` | Literature Research |
 
@@ -271,7 +271,7 @@ claude-code
 
 ```bash
 # GPT-5.2 Technical Review
-codex exec -m gpt-5.2 --sandbox read-only --reasoning high "[prompt]"
+codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
 
 # Gemini Style Review
 gemini -y "[prompt]"

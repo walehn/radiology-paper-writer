@@ -140,7 +140,7 @@ Generating Introduction:
 
    **GPT-5.2 (Technical Review, reasoning: high):**
    ```bash
-   codex exec -m gpt-5.2 --sandbox read-only --reasoning high "[prompt from references/codex-prompts.md]"
+   codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt from references/codex-prompts.md]"
    ```
 
    **Gemini (Style Review):**
@@ -285,10 +285,10 @@ Review results are presented in this unified format:
 
 ```bash
 # Single review (read-only sandbox, high reasoning)
-codex exec -m gpt-5.2 --sandbox read-only --reasoning high "[prompt]"
+codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
 
 # Follow-up in same session
-codex exec resume --last "[follow-up prompt]"
+/home/walehn/.nvm/versions/node/v22.17.1/bin/codex exec    resume --last "[follow-up prompt]"
 ```
 
 ### Gemini Execution
