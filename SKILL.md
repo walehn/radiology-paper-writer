@@ -1,6 +1,6 @@
 ---
 name: radiology-paper-writer
-description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.2 (reasoning: high) reviews methodology, Gemini reviews style, Gemini 3 Pro conducts literature research. Supports STARD/TRIPOD/CLAIM checklists. Triggers on /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands.
+description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.4 (reasoning: high) reviews methodology, Gemini reviews style, Gemini 3.1 Pro conducts literature research. Supports STARD/TRIPOD/CLAIM checklists. Triggers on /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands.
 ---
 
 # Radiology Paper Writer
@@ -12,9 +12,9 @@ description: AI-assisted radiology research paper writing with multi-model revie
 | Model | Role | Focus Areas |
 |-------|------|-------------|
 | **Claude Code** | Main Editor | 초안 작성, 피드백 통합, 수정, 버전 관리 |
-| **GPT-5.2 (reasoning: high)** | Technical Reviewer | 연구 설계, 통계, 논리 일관성, 방법론 |
-| **Gemini 3.0 Pro** | Style Reviewer | 문장 자연스러움, 가독성, 저널 스타일, clarity |
-| **Gemini 3 Pro** | Literature Researcher | 문헌 검토, knowledge gap 분석, 인용 제안 |
+| **GPT-5.4 (reasoning: high)** | Technical Reviewer | 연구 설계, 통계, 논리 일관성, 방법론 |
+| **Gemini 3.1 Pro** | Style Reviewer | 문장 자연스러움, 가독성, 저널 스타일, clarity |
+| **Gemini 3.1 Pro** | Literature Researcher | 문헌 검토, knowledge gap 분석, 인용 제안 |
 
 ## Supported Study Types
 
@@ -23,6 +23,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 - `segmentation_ai` - AI 분할 연구 (CLAIM checklist)
 - `screening` - 스크리닝 연구 (STARD + screening extensions)
 - `interventional` - 중재 영상의학 연구
+- `llm_study` - LLM 활용 연구 (MI-CLEAR-LLM + TRIPOD-LLM checklist)
 
 ## Supported Section Types
 
@@ -72,7 +73,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 
 ### /radiology-intro [topic]
 
-문헌 기반 Introduction 섹션을 작성합니다. Gemini 3 Pro를 활용하여 관련 문헌을 검토하고 3-paragraph 구조의 Introduction을 생성합니다.
+문헌 기반 Introduction 섹션을 작성합니다. Gemini 3.1 Pro를 활용하여 관련 문헌을 검토하고 3-paragraph 구조의 Introduction을 생성합니다.
 
 **Workflow:**
 
@@ -83,9 +84,9 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
    - Target journal
    - Language (en/ko)
 
-2. **Literature Research** - Gemini 3 Pro 문헌 분석
+2. **Literature Research** - Gemini 3.1 Pro 문헌 분석
    ```bash
-   gemini -m gemini-3-pro -y "[research prompt from references/gemini-prompts.md]"
+   gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt from references/gemini-prompts.md]"
    ```
 
    Output includes:
@@ -103,7 +104,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
    - Integrate literature findings and citation suggestions
 
 4. **Optional Dual Review** - Ask user if they want immediate review
-   - GPT-5.2: Clinical relevance, gap clarity, objective alignment
+   - GPT-5.4: Clinical relevance, gap clarity, objective alignment
    - Gemini: Flow, readability, citation integration
 
 **Example:**
@@ -116,7 +117,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 > Language: en
 
 Researching with:
-- Gemini 3 Pro: Literature analysis, knowledge gap identification
+- Gemini 3.1 Pro: Literature analysis, knowledge gap identification
 
 Generating Introduction:
 - Paragraph 1: Clinical importance of liver metastasis detection
@@ -135,17 +136,18 @@ Generating Introduction:
    - diagnostic_accuracy → STARD 2015 + STARD-AI (if AI)
    - prognostic → TRIPOD + TRIPOD+AI (if AI)
    - segmentation_ai → CLAIM 2024
+   - llm_study → MI-CLEAR-LLM + TRIPOD-LLM + DEAL
 
 3. **Parallel Review Execution**
 
-   **GPT-5.2 (Technical Review, reasoning: high):**
+   **GPT-5.4 (Technical Review, reasoning: high):**
    ```bash
-   codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt from references/codex-prompts.md]"
+   codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt from references/codex-prompts.md]"
    ```
 
    **Gemini (Style Review):**
    ```bash
-   gemini -y "[prompt from references/gemini-prompts.md]"
+   gemini --approval-mode yolo "[prompt from references/gemini-prompts.md]"
    ```
 
 4. **Feedback Integration**
@@ -160,8 +162,8 @@ Generating Introduction:
 [User provides or Claude reads the Methods section text]
 
 Reviewing with:
-- GPT-5.2 (reasoning: high): Methodological rigor, statistics, bias
-- Gemini 3.0 Pro: Clarity, structure, readability
+- GPT-5.4 (reasoning: high): Methodological rigor, statistics, bias
+- Gemini 3.1 Pro: Clarity, structure, readability
 ```
 
 ### /radiology-revise
@@ -184,7 +186,7 @@ Reviewing with:
 
 ### Abstract
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Structure: 목적-방법-결과-결론 | Sentence brevity (< 25 words) |
 | Number consistency with Results | Information density |
@@ -194,7 +196,7 @@ Reviewing with:
 
 ### Introduction
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Clinical relevance established | General → Specific flow |
 | Literature balance (not cherry-picked) | Paragraph unity |
@@ -205,7 +207,7 @@ Reviewing with:
 
 ### Methods
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -217,7 +219,7 @@ Reviewing with:
 
 ### Results
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Table/figure vs text consistency | One message per paragraph |
 | Primary outcome prominence | Key message first |
@@ -226,7 +228,7 @@ Reviewing with:
 
 ### Discussion
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Interpretation validity | Logical flow |
 | Novelty vs literature context | Transition sentences |
@@ -247,7 +249,7 @@ Review results are presented in this unified format:
       "location": "paragraph/sentence reference",
       "description": "issue description",
       "severity": "critical|major|minor",
-      "source": "gpt-5.2"
+      "source": "gpt-5.4"
     }
   ],
   "clarity_issues": [
@@ -281,11 +283,11 @@ Review results are presented in this unified format:
 
 ## CLI Command Reference
 
-### GPT-5.2 Execution (via Codex CLI)
+### GPT-5.4 Execution (via Codex CLI)
 
 ```bash
 # Single review (read-only sandbox, high reasoning)
-codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
 
 # Follow-up in same session
 /home/walehn/.nvm/versions/node/v22.17.1/bin/codex exec    resume --last "[follow-up prompt]"
@@ -294,14 +296,14 @@ codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "
 ### Gemini Execution
 
 ```bash
-# Style review (Gemini 3.0 Pro, auto-approve mode)
-gemini -y "[prompt]"
+# Style review (Gemini 3.1 Pro, auto-approve mode)
+gemini --approval-mode yolo "[prompt]"
 
 # With JSON output preference
-gemini -y "[prompt requesting JSON output]"
+gemini --approval-mode yolo "[prompt requesting JSON output]"
 
-# Literature research (Gemini 3 Pro with extended reasoning)
-gemini -m gemini-3-pro -y "[research prompt]"
+# Literature research (Gemini 3.1 Pro with extended reasoning)
+gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 ```
 
 ---
@@ -310,8 +312,8 @@ gemini -m gemini-3-pro -y "[research prompt]"
 
 | Scenario | Action |
 |----------|--------|
-| GPT-5.2 timeout/failure | Retry once, then Claude-only review with notice |
-| Gemini error | Continue with GPT-5.2 review only, notify user |
+| GPT-5.4 timeout/failure | Retry once, then Claude-only review with notice |
+| Gemini error | Continue with GPT-5.4 review only, notify user |
 | Both CLI failures | Claude provides basic review with apology |
 | Invalid JSON response | Extract text feedback, present as unstructured |
 | Empty response | Retry with simplified prompt |
@@ -326,7 +328,7 @@ gemini -m gemini-3-pro -y "[research prompt]"
 - Feedback in English
 
 ### Korean (language="ko")
-- GPT-5.2 prompts: Keep English (technical consistency)
+- GPT-5.4 prompts: Keep English (technical consistency)
 - Gemini prompts: Add Korean style guidelines
 - Output feedback: Present in Korean
 - Checklists: Item names in English, descriptions bilingual
@@ -352,8 +354,8 @@ Korean-specific style rules:
 
 ## Reference Files
 
-- `references/radiology-checklists.md` - STARD, TRIPOD, CLAIM checklists
+- `references/radiology-checklists.md` - STARD, TRIPOD, CLAIM, MI-CLEAR-LLM, TRIPOD-LLM, DEAL, CHART checklists
 - `references/section-templates.md` - Section-specific review criteria details
 - `references/journal-profiles.md` - Journal requirements and formatting
-- `references/codex-prompts.md` - GPT-5.2 review prompts by section
+- `references/codex-prompts.md` - GPT-5.4 review prompts by section
 - `references/gemini-prompts.md` - Gemini review prompts by section

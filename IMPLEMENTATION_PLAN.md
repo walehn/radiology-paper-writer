@@ -10,8 +10,8 @@
 
 **핵심 구조:**
 - Claude Code: 메인 에디터 (초안 작성, 피드백 통합, 수정)
-- GPT 5.2 (Codex CLI): 기술/논리/방법론 리뷰어
-- Gemini 3.0 Pro (Gemini CLI): 스타일/가독성/저널 스타일 리뷰어
+- GPT 5.4 (Codex CLI): 기술/논리/방법론 리뷰어
+- Gemini 3.1 Pro (Gemini CLI): 스타일/가독성/저널 스타일 리뷰어
 
 ---
 
@@ -25,7 +25,7 @@
 │   ├── radiology-checklists.md        # STARD, TRIPOD, CLAIM-AI
 │   ├── section-templates.md           # 섹션별 리뷰 기준
 │   ├── journal-profiles.md            # 저널별 요구사항
-│   ├── codex-prompts.md               # GPT-5.2 리뷰 프롬프트
+│   ├── codex-prompts.md               # GPT-5.4 리뷰 프롬프트
 │   └── gemini-prompts.md              # Gemini 리뷰 프롬프트
 ```
 
@@ -41,7 +41,7 @@
 ```yaml
 ---
 name: radiology-paper-writer
-description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.2 reviews methodology, Gemini reviews style. Supports STARD/TRIPOD/CLAIM checklists. Triggers: /radiology-draft, /radiology-review, /radiology-revise
+description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.4 reviews methodology, Gemini reviews style. Supports STARD/TRIPOD/CLAIM checklists. Triggers: /radiology-draft, /radiology-review, /radiology-revise
 ---
 ```
 
@@ -96,7 +96,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 
 **File:** `references/codex-prompts.md`
 
-**Per-section prompts for GPT-5.2:**
+**Per-section prompts for GPT-5.4:**
 - JSON 출력 형식 지정
 - 기술적 평가 항목 명시
 - checklist compliance 확인
@@ -132,7 +132,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 3. Parallel Review (Optional)
    ┌─────────────────┐  ┌─────────────────┐
    │ Codex Technical │  │ Gemini Style    │
-   │ codex exec ...  │  │ gemini -y ...   │
+   │ codex exec ...  │  │ gemini --approval-mode yolo ...   │
    └─────────────────┘  └─────────────────┘
 
 4. Integration (Claude)
@@ -147,8 +147,8 @@ description: AI-assisted radiology research paper writing with multi-model revie
 1. Parse draft_text
 2. Determine checklist (STARD/TRIPOD/CLAIM)
 3. Parallel execution:
-   - Codex: codex exec -m gpt-5.2 --sandbox read-only "[prompt]"
-   - Gemini: gemini -y "[prompt]"
+   - Codex: codex exec -m gpt-5.4 --sandbox read-only "[prompt]"
+   - Gemini: gemini --approval-mode yolo "[prompt]"
 4. Parse & merge responses
 5. Present unified feedback
 ```
@@ -169,13 +169,13 @@ description: AI-assisted radiology research paper writing with multi-model revie
 
 **Codex:**
 ```bash
-codex exec -m gpt-5.2 --sandbox read-only "[prompt with draft]"
+codex exec -m gpt-5.4 --sandbox read-only "[prompt with draft]"
 codex exec resume --last "[follow-up]"
 ```
 
 **Gemini:**
 ```bash
-gemini -y "[prompt with draft]"
+gemini --approval-mode yolo "[prompt with draft]"
 ```
 
 ---
@@ -233,7 +233,7 @@ gemini -y "[prompt with draft]"
 | 2 | references/radiology-checklists.md | STARD/TRIPOD/CLAIM 체크리스트 | ✅ |
 | 3 | references/section-templates.md | 섹션별 리뷰 기준 | ✅ |
 | 4 | references/journal-profiles.md | 저널별 요구사항 | ✅ |
-| 5 | references/codex-prompts.md | GPT-5.2 프롬프트 | ✅ |
+| 5 | references/codex-prompts.md | GPT-5.4 프롬프트 | ✅ |
 | 6 | references/gemini-prompts.md | Gemini 프롬프트 | ✅ |
 
 ---

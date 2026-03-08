@@ -94,9 +94,9 @@
 - Study type (diagnostic_accuracy, prognostic, segmentation_ai)
 - Target journal
 
-**Step 2: Gemini 3 Pro Literature Analysis**
+**Step 2: Gemini 3.1 Pro Literature Analysis**
 ```bash
-gemini -m gemini-3-pro -y "[Research Prompt]"
+gemini -m gemini-3.1-pro-preview --approval-mode yolo "[Research Prompt]"
 ```
 Output includes:
 - Clinical context summary
@@ -112,7 +112,7 @@ Output includes:
 - Integrate suggested citations
 
 **Step 4: Dual Review (Optional)**
-- GPT-5.2: Clinical relevance, gap clarity, objective alignment
+- GPT-5.4: Clinical relevance, gap clarity, objective alignment
 - Gemini: Flow, readability, citation integration
 
 ### Paragraph-Specific Guidelines
@@ -187,7 +187,7 @@ Output includes:
 | Prognostic | develop, validate, evaluate predictive value of |
 | Comparative | compare, assess superiority/noninferiority of |
 
-### Technical Review Criteria (GPT-5.2)
+### Technical Review Criteria (GPT-5.4)
 
 | Category | Check | Severity |
 |----------|-------|----------|

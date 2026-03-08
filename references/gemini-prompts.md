@@ -5,11 +5,11 @@ Style, readability, journal compliance, and literature research prompts for Gemi
 ## Usage
 
 ```bash
-# Style review (Gemini 3.0 Pro)
-gemini -y "[STYLE PROMPT]"
+# Style review (Gemini 3.1 Pro)
+gemini --approval-mode yolo "[STYLE PROMPT]"
 
-# Literature research (Gemini 3 Pro with extended reasoning)
-gemini -m gemini-3-pro -y "[RESEARCH PROMPT]"
+# Literature research (Gemini 3.1 Pro with extended reasoning)
+gemini -m gemini-3.1-pro-preview --approval-mode yolo "[RESEARCH PROMPT]"
 ```
 
 ---
@@ -495,7 +495,7 @@ Focus on: formatting, terminology, structure. Return compliance issues.
 
 ## Introduction Research Prompt
 
-**Model:** Gemini 3 Pro (`gemini -m gemini-3-pro`)
+**Model:** Gemini 3.1 Pro (`gemini -m gemini-3.1-pro-preview`)
 **Purpose:** Literature review and knowledge gap analysis for Introduction writing
 
 ```
@@ -594,7 +594,7 @@ Your task is to provide a structured literature analysis for writing an Introduc
 
 ## Introduction Style Review Prompt
 
-**Model:** Gemini 3.0 Pro (`gemini -y`)
+**Model:** Gemini 3.1 Pro (`gemini --approval-mode yolo`)
 **Purpose:** Style and flow review for Introduction section
 
 ```

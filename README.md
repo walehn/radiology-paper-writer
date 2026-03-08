@@ -29,7 +29,7 @@
        ┌──────────────────────┼──────────────────────┐
        ▼                      ▼                      ▼
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│ GPT-5.2          │  │ Gemini 3.0 Pro   │  │ Gemini 3 Pro     │
+│ GPT-5.4          │  │ Gemini 3.1 Pro   │  │ Gemini 3.1 Pro   │
 │ (reasoning: high)│  │ Style Reviewer   │  │ Lit. Researcher  │
 ├──────────────────┤  ├──────────────────┤  ├──────────────────┤
 │ • 연구 설계 검증 │  │ • 문장 자연스러움│  │ • 문헌 검토      │
@@ -52,6 +52,7 @@
 | `segmentation_ai` | AI 분할 연구 | CLAIM 2024 |
 | `screening` | 스크리닝 연구 | STARD + screening extensions |
 | `interventional` | 중재 영상의학 연구 | Custom criteria |
+| `llm_study` | LLM 활용 연구 | MI-CLEAR-LLM + TRIPOD-LLM + DEAL |
 
 ### Supported Sections
 
@@ -66,7 +67,7 @@
 
 ### Key Capabilities
 
-- **Literature Research**: Gemini 3 Pro를 활용한 자동 문헌 검토 및 gap 분석
+- **Literature Research**: Gemini 3.1 Pro를 활용한 자동 문헌 검토 및 gap 분석
 - **Checklist Compliance**: STARD, TRIPOD, CLAIM 자동 검증
 - **Number Consistency**: Abstract-Results-Tables 수치 일치 확인
 - **Overclaim Detection**: "first", "novel", "superior" 등 과장 표현 감지
@@ -113,7 +114,7 @@ Research Topic + Keywords
           │
           ▼
 ┌─────────────────────────┐
-│ Gemini 3 Pro            │
+│ Gemini 3.1 Pro          │
 │ Literature Analysis     │
 ├─────────────────────────┤
 │ • Clinical context      │
@@ -136,7 +137,7 @@ Research Topic + Keywords
 ┌─────────────────────────┐
 │ Dual Review (Optional)  │
 ├─────────────────────────┤
-│ GPT-5.2: Gap alignment  │
+│ GPT-5.4: Gap alignment  │
 │ Gemini: Flow, clarity   │
 └─────────────────────────┘
 ```
@@ -153,7 +154,7 @@ Research Topic + Keywords
 
 **Parallel Review Process:**
 ```
-GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
+GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
         │                                │
         ▼                                ▼
   Technical Issues                 Style Issues
@@ -190,7 +191,7 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
       "location": "Patient Selection, paragraph 2",
       "description": "Eligibility criteria not explicitly stated",
       "severity": "critical",
-      "source": "gpt-5.2"
+      "source": "gpt-5.4"
     }
   ],
   "clarity_issues": [
@@ -216,7 +217,7 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
 
 ### Methods Section Example
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Gemini (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -263,29 +264,29 @@ claude-code
 
 | Model | CLI | Parameters | Purpose |
 |-------|-----|------------|---------|
-| GPT-5.2 | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Technical Review |
-| Gemini 3.0 Pro | Gemini | `-y` (auto-approve) | Style Review |
-| Gemini 3 Pro | Gemini | `-m gemini-3-pro -y` | Literature Research |
+| GPT-5.4 | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Technical Review |
+| Gemini 3.1 Pro | Gemini | `--approval-mode yolo` (auto-approve) | Style Review |
+| Gemini 3.1 Pro | Gemini | `-m gemini-3.1-pro-preview --approval-mode yolo` | Literature Research |
 
 ### Execution Commands
 
 ```bash
-# GPT-5.2 Technical Review
-codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+# GPT-5.4 Technical Review
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
 
 # Gemini Style Review
-gemini -y "[prompt]"
+gemini --approval-mode yolo "[prompt]"
 
-# Gemini 3 Pro Literature Research
-gemini -m gemini-3-pro -y "[research prompt]"
+# Gemini 3.1 Pro Literature Research
+gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 ```
 
 ### Error Handling
 
 | Scenario | Action |
 |----------|--------|
-| GPT-5.2 timeout/failure | Retry once, then Claude-only review |
-| Gemini error | Continue with GPT-5.2 review only |
+| GPT-5.4 timeout/failure | Retry once, then Claude-only review |
+| Gemini error | Continue with GPT-5.4 review only |
 | Both CLI failures | Claude provides basic review |
 | Invalid JSON response | Extract text feedback, present as unstructured |
 
@@ -298,7 +299,7 @@ gemini -m gemini-3-pro -y "[research prompt]"
 - Checklists in English
 
 ### Korean (`language="ko"`)
-- GPT-5.2 prompts: English (technical consistency)
+- GPT-5.4 prompts: English (technical consistency)
 - Gemini prompts: Korean style guidelines added
 - Output feedback: Korean
 - Korean-specific rules:
@@ -331,7 +332,7 @@ gemini -m gemini-3-pro -y "[research prompt]"
     ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
     ├── section-templates.md          # Section-specific templates
     ├── journal-profiles.md           # Journal requirements
-    ├── codex-prompts.md              # GPT-5.2 review prompts
+    ├── codex-prompts.md              # GPT-5.4 review prompts
     └── gemini-prompts.md             # Gemini review prompts
 ```
 

@@ -1,11 +1,11 @@
-# Codex (GPT-5.2) Review Prompts
+# Codex (GPT-5.4) Review Prompts
 
-Technical and methodological review prompts for GPT-5.2 via Codex CLI
+Technical and methodological review prompts for GPT-5.4 via Codex CLI
 
 ## Usage
 
 ```bash
-codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
 ```
 
 ---
