@@ -41,6 +41,43 @@
 
 ---
 
+## Installation
+
+### Prerequisites
+
+- **Node.js** (v18+) 및 **npm** — Codex CLI, Gemini CLI 설치에 필요
+
+세 가지 CLI 도구를 모두 설치하고 인증을 완료해야 합니다:
+
+| CLI | 설치 | 인증 방법 |
+|-----|------|----------|
+| [Claude Code](https://claude.ai/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (macOS/Linux/WSL) | 구독 (Pro/Max) 또는 API 키 (`ANTHROPIC_API_KEY`) |
+| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | OAuth 로그인 (`codex auth`) 또는 API 키 (`OPENAI_API_KEY`) |
+| [Gemini CLI](https://github.com/google/gemini-cli) | `npm install -g @google/gemini-cli` | Google OAuth (`gemini auth`) 또는 API 키 (`GEMINI_API_KEY`) |
+
+> **Note:** Claude Code Windows 설치: PowerShell `irm https://claude.ai/install.ps1 | iex` / CMD `curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd`. Windows의 경우 [Git for Windows](https://gitforwindows.org/) 설치가 필요합니다.
+
+### Setup
+
+1. 스킬 디렉토리 생성:
+```bash
+mkdir -p ~/.claude/skills/radiology-paper-writer/references
+```
+
+2. 스킬 파일 복사:
+```bash
+# SKILL.md와 references/ 디렉토리를 복사
+cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
+```
+
+3. Claude Code에서 스킬 확인:
+```bash
+claude-code
+# /radiology-draft, /radiology-review, /radiology-revise 명령어 사용 가능
+```
+
+---
+
 ## Features
 
 ### Supported Study Types
@@ -181,7 +218,7 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 
 ## Output Format
 
-리뷰 결과는 구조화된 JSON으로 제공됩니다:
+리뷰 결과는 구조화된 JSON으로 제공되며, `output/{section}_{timestamp}/` 디렉토리에 JSON과 Markdown 두 가지 형식으로 자동 저장됩니다 (자세한 내용은 [Output Files](#output-files) 참조):
 
 ```json
 {
@@ -213,6 +250,55 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 
 ---
 
+## Output Files
+
+리뷰 결과는 자동으로 `output/` 디렉토리에 JSON과 Markdown 두 가지 형식으로 저장됩니다.
+
+### 출력 디렉토리 구조
+
+```
+output/
+├── methods_20260308_143022/
+│   ├── review_result.json       # 구조화된 JSON 리뷰 결과
+│   ├── review_report.md         # 사람이 읽기 쉬운 Markdown 리포트
+│   ├── codex_raw.json           # GPT-5.4 원본 응답 (성공 시)
+│   └── gemini_raw.json          # Gemini 원본 응답 (성공 시)
+├── abstract_20260309_091500/
+│   ├── review_result.json
+│   ├── review_report.md
+│   └── ...
+```
+
+### 파일 설명
+
+| 파일 | 형식 | 설명 |
+|------|------|------|
+| `review_result.json` | JSON | 통합된 리뷰 결과 (major_issues, clarity_issues, checklist 등) |
+| `review_report.md` | Markdown | 헤더, 이슈 요약, 수정 제안, 체크리스트 현황 등 포함된 리포트 |
+| `codex_raw.json` | JSON | GPT-5.4의 원본 응답 (추적 및 디버깅용) |
+| `gemini_raw.json` | JSON | Gemini의 원본 응답 (추적 및 디버깅용) |
+
+### review_report.md 구성
+
+생성되는 Markdown 리포트는 다음 섹션으로 구성됩니다:
+
+1. **Header** - 섹션 유형, 연구 유형, 타깃 저널, 리뷰 일시
+2. **Major Issues** - 심각도순 정렬 (critical > major > minor), 모델 출처 표시
+3. **Clarity Issues** - 가독성/구조/흐름 이슈 및 개선 제안
+4. **Terminology & Consistency** - 용어 및 일관성 이슈
+5. **Candidate Rewrites** - 원문 vs 수정안 비교 (근거 포함)
+6. **Checklist Compliance** - 준수/누락/불완전 항목 및 준수율
+7. **Summary Statistics** - 심각도별 이슈 수, 체크리스트 준수율 (%)
+
+### 디렉토리 규칙
+
+- 모든 출력은 프로젝트 루트의 `output/` 디렉토리 아래에 생성됩니다
+- 각 리뷰 세션마다 새로운 타임스탬프 디렉토리가 생성됩니다
+- 이전 결과는 덮어쓰지 않습니다
+- 디렉토리 이름: `{섹션}_{YYYYMMDD_HHMMSS}` (예: `methods_20260308_143022`)
+
+---
+
 ## Section-Specific Review Criteria
 
 ### Methods Section Example
@@ -226,35 +312,6 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 | Sample size justification | Readability score |
 | Multiple comparison correction | |
 | Inter-reader agreement | |
-
----
-
-## Installation
-
-### Prerequisites
-
-- [Claude Code](https://claude.ai/claude-code) CLI 설치
-- [Codex CLI](https://github.com/openai/codex) 설치 및 OpenAI API 키 설정
-- [Gemini CLI](https://github.com/google/gemini-cli) 설치 및 Google API 키 설정
-
-### Setup
-
-1. 스킬 디렉토리 생성:
-```bash
-mkdir -p ~/.claude/skills/radiology-paper-writer/references
-```
-
-2. 스킬 파일 복사:
-```bash
-# SKILL.md와 references/ 디렉토리를 복사
-cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
-```
-
-3. Claude Code에서 스킬 확인:
-```bash
-claude-code
-# /radiology-draft, /radiology-review, /radiology-revise 명령어 사용 가능
-```
 
 ---
 
@@ -328,12 +385,20 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 ├── SKILL.md                          # Main skill definition
 ├── README.md                         # This documentation
 ├── IMPLEMENTATION_PLAN.md            # Development roadmap
-└── references/
-    ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
-    ├── section-templates.md          # Section-specific templates
-    ├── journal-profiles.md           # Journal requirements
-    ├── codex-prompts.md              # GPT-5.4 review prompts
-    └── gemini-prompts.md             # Gemini review prompts
+├── references/
+│   ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
+│   ├── section-templates.md          # Section-specific templates
+│   ├── journal-profiles.md           # Journal requirements
+│   ├── codex-prompts.md              # GPT-5.4 review prompts
+│   └── gemini-prompts.md             # Gemini review prompts
+└── output/                           # Auto-generated review outputs
+    ├── methods_20260308_143022/
+    │   ├── review_result.json
+    │   ├── review_report.md
+    │   ├── codex_raw.json
+    │   └── gemini_raw.json
+    └── abstract_20260309_091500/
+        └── ...
 ```
 
 ---

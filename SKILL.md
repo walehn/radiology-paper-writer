@@ -62,6 +62,10 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 3. **Optional Dual Review** - Ask user if they want immediate review
    - If yes, run /radiology-review workflow
 
+4. **Save Output** - Save draft and review results to `output/{section}_{timestamp}/`
+   - Save review_result.json and review_report.md (if dual review was executed)
+   - Save raw model responses (codex_raw.json, gemini_raw.json) when available
+
 **Example:**
 ```
 /radiology-draft Methods
@@ -106,6 +110,10 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 4. **Optional Dual Review** - Ask user if they want immediate review
    - GPT-5.4: Clinical relevance, gap clarity, objective alignment
    - Gemini: Flow, readability, citation integration
+
+5. **Save Output** - Save results to `output/introduction_{timestamp}/`
+   - Save review_result.json and review_report.md (if dual review was executed)
+   - Save raw model responses (codex_raw.json, gemini_raw.json) when available
 
 **Example:**
 ```
@@ -155,6 +163,12 @@ Generating Introduction:
    - Merge into unified output structure
    - Generate checklist compliance status
 
+5. **Save Output** - Save all results to `output/{section}_{timestamp}/`
+   - Save `review_result.json` (unified structured output)
+   - Generate and save `review_report.md` (human-readable Markdown report)
+   - Save `codex_raw.json` (raw GPT-5.4 response, if available)
+   - Save `gemini_raw.json` (raw Gemini response, if available)
+
 **Example:**
 ```
 /radiology-review Methods
@@ -179,6 +193,7 @@ Reviewing with:
 3. Generate revised draft
 4. Optional: Re-run targeted reviews on changed sections
 5. Track revision history
+6. **Save Output** - Save revised draft and any re-review results to `output/{section}_{timestamp}/`
 
 ---
 
@@ -237,9 +252,57 @@ Reviewing with:
 
 ---
 
+## Output Saving
+
+Review results are automatically saved in dual format (JSON + Markdown) to the `output/` directory.
+
+### Output Directory Structure
+
+```
+output/
+├── {section}_{timestamp}/
+│   ├── review_result.json       # Structured JSON output
+│   ├── review_report.md         # Human-readable Markdown report
+│   ├── codex_raw.json           # Raw GPT-5.4 response (if available)
+│   └── gemini_raw.json          # Raw Gemini response (if available)
+```
+
+- `{section}` = section type in lowercase (e.g., methods, abstract, discussion)
+- `{timestamp}` = YYYYMMDD_HHMMSS format (e.g., 20260308_143022)
+
+### review_result.json
+
+Contains the unified structured JSON output (see Output Structure below).
+
+### review_report.md
+
+A human-readable Markdown report with the following sections:
+
+1. **Header** - Section type, study type, target journal, review date
+2. **Major Issues** - From `major_issues`, sorted by severity (critical > major > minor), with source attribution
+3. **Clarity Issues** - From `clarity_issues`, with suggestions
+4. **Terminology & Consistency** - From `terminology_and_consistency`
+5. **Candidate Rewrites** - Original vs revised text with rationale (diff-style presentation)
+6. **Checklist Compliance** - Compliant/missing/incomplete items with compliance rate
+7. **Summary Statistics** - Total issues by severity, compliance rate percentage
+
+### Raw Response Files
+
+- `codex_raw.json` - Raw GPT-5.4 response preserved for traceability (saved only when GPT-5.4 review succeeds)
+- `gemini_raw.json` - Raw Gemini response preserved for traceability (saved only when Gemini review succeeds)
+
+### Output Directory Convention
+
+- All output directories are created under `output/` in the project root
+- Each review session creates a new timestamped directory
+- Previous results are never overwritten
+- Directory naming: `{section}_{YYYYMMDD_HHMMSS}` (e.g., `methods_20260308_143022`)
+
+---
+
 ## Output Structure
 
-Review results are presented in this unified format:
+Review results are presented in this unified format and saved to `review_result.json`:
 
 ```json
 {
