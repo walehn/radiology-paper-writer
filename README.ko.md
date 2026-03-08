@@ -71,14 +71,17 @@
 
 ### 설정
 
-1. 스킬 디렉토리 생성:
+1. 저장소 클론:
 ```bash
-mkdir -p ~/.claude/skills/radiology-paper-writer/references
+git clone https://github.com/walehn/radiology-paper-writer.git
+cd radiology-paper-writer
 ```
 
-2. 스킬 파일 복사:
+2. 스킬 디렉토리 생성 및 파일 복사:
 ```bash
-cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
+mkdir -p ~/.claude/skills/radiology-paper-writer/references
+cp SKILL.md IMPLEMENTATION_PLAN.md ~/.claude/skills/radiology-paper-writer/
+cp references/*.md ~/.claude/skills/radiology-paper-writer/references/
 ```
 
 3. Claude Code에서 스킬 확인:

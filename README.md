@@ -71,14 +71,17 @@ All three CLI tools must be installed and authenticated:
 
 ### Setup
 
-1. Create skill directory:
+1. Clone the repository:
 ```bash
-mkdir -p ~/.claude/skills/radiology-paper-writer/references
+git clone https://github.com/walehn/radiology-paper-writer.git
+cd radiology-paper-writer
 ```
 
-2. Copy skill files:
+2. Create skill directory and copy files:
 ```bash
-cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
+mkdir -p ~/.claude/skills/radiology-paper-writer/references
+cp SKILL.md IMPLEMENTATION_PLAN.md ~/.claude/skills/radiology-paper-writer/
+cp references/*.md ~/.claude/skills/radiology-paper-writer/references/
 ```
 
 3. Verify in Claude Code:
