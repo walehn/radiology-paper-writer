@@ -1,8 +1,20 @@
-# Radiology Paper Writer
+<h1 align="center">Radiology Paper Writer</h1>
 
-> AI-assisted radiology research paper writing with multi-model review system
+<p align="center">
+  <strong>AI-assisted radiology research paper writing with multi-model review system</strong>
+</p>
 
-영상의학 연구 논문 작성 및 교정을 위한 Claude Code 스킬입니다. 네 가지 AI 모델이 협업하여 학술 논문의 문헌 리서치, 초안 작성, 방법론 검토, 문체 교정까지 체계적으로 지원합니다.
+<p align="center">
+  <a href="./README.md">English</a> ·
+  <a href="./README.ko.md">한국어</a>
+</p>
+
+<p align="center">
+  <a href="https://claude.ai/claude-code"><img src="https://img.shields.io/badge/Claude_Code-Skill-blueviolet?style=flat&logo=anthropic" alt="Claude Code"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex_CLI-GPT--5.4-412991?style=flat&logo=openai&logoColor=white" alt="Codex CLI"></a>
+  <a href="https://github.com/google/gemini-cli"><img src="https://img.shields.io/badge/Gemini_CLI-3.1_Pro-4285F4?style=flat&logo=google&logoColor=white" alt="Gemini CLI"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT"></a>
+</p>
 
 ---
 
@@ -10,20 +22,20 @@
 
 ### The Problem
 
-영상의학 연구 논문 작성 시 흔히 겪는 어려움:
-- STARD, TRIPOD, CLAIM 등 복잡한 체크리스트 준수
-- 통계 수치의 일관성 유지 (Abstract ↔ Results ↔ Tables)
-- 방법론적 엄밀성과 가독성의 균형
-- 저널별 다른 포맷 요구사항
+Common challenges when writing radiology research papers:
+- Complying with complex checklists (STARD, TRIPOD, CLAIM, etc.)
+- Maintaining number consistency across Abstract, Results, and Tables
+- Balancing methodological rigor with readability
+- Meeting different formatting requirements per journal
 
 ### The Solution
 
-**Multi-Model System**: 각 모델이 전문 분야에 집중
+**Multi-Model System**: Each model focuses on its area of expertise
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Claude Code (Main Editor)                 │
-│         초안 작성 · 피드백 통합 · 수정 · 버전 관리            │
+│            Drafting · Feedback Integration · Revision        │
 └─────────────────────────────────────────────────────────────┘
                               │
        ┌──────────────────────┼──────────────────────┐
@@ -32,10 +44,10 @@
 │ GPT-5.4          │  │ Gemini 3.1 Pro   │  │ Gemini 3.1 Pro   │
 │ (reasoning: high)│  │ Style Reviewer   │  │ Lit. Researcher  │
 ├──────────────────┤  ├──────────────────┤  ├──────────────────┤
-│ • 연구 설계 검증 │  │ • 문장 자연스러움│  │ • 문헌 검토      │
-│ • 통계 분석      │  │ • 가독성 향상    │  │ • Gap 분석       │
-│ • 논리적 일관성  │  │ • 저널 스타일    │  │ • 인용 제안      │
-│ • 방법론 체크    │  │ • Clarity 개선   │  │ • 배경 연구      │
+│ • Study design   │  │ • Sentence flow  │  │ • Lit. review    │
+│ • Statistics     │  │ • Readability    │  │ • Gap analysis   │
+│ • Logical rigor  │  │ • Journal style  │  │ • Citations      │
+│ • Methodology    │  │ • Clarity        │  │ • Background     │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
@@ -45,35 +57,34 @@
 
 ### Prerequisites
 
-- **Node.js** (v18+) 및 **npm** — Codex CLI, Gemini CLI 설치에 필요
+- **Node.js** (v18+) and **npm** — required for Codex CLI and Gemini CLI installation
 
-세 가지 CLI 도구를 모두 설치하고 인증을 완료해야 합니다:
+All three CLI tools must be installed and authenticated:
 
-| CLI | 설치 | 인증 방법 |
-|-----|------|----------|
-| [Claude Code](https://claude.ai/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (macOS/Linux/WSL) | 구독 (Pro/Max) 또는 API 키 (`ANTHROPIC_API_KEY`) |
-| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | OAuth 로그인 (`codex auth`) 또는 API 키 (`OPENAI_API_KEY`) |
-| [Gemini CLI](https://github.com/google/gemini-cli) | `npm install -g @google/gemini-cli` | Google OAuth (`gemini auth`) 또는 API 키 (`GEMINI_API_KEY`) |
+| CLI | Install | Authentication |
+|-----|---------|----------------|
+| [Claude Code](https://claude.ai/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (macOS/Linux/WSL) | Subscription (Pro/Max) or API key (`ANTHROPIC_API_KEY`) |
+| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | OAuth login (`codex auth`) or API key (`OPENAI_API_KEY`) |
+| [Gemini CLI](https://github.com/google/gemini-cli) | `npm install -g @google/gemini-cli` | Google OAuth (`gemini auth`) or API key (`GEMINI_API_KEY`) |
 
-> **Note:** Claude Code Windows 설치: PowerShell `irm https://claude.ai/install.ps1 | iex` / CMD `curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd`. Windows의 경우 [Git for Windows](https://gitforwindows.org/) 설치가 필요합니다.
+> **Note:** Claude Code on Windows: PowerShell `irm https://claude.ai/install.ps1 | iex` / CMD `curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd`. Windows requires [Git for Windows](https://gitforwindows.org/).
 
 ### Setup
 
-1. 스킬 디렉토리 생성:
+1. Create skill directory:
 ```bash
 mkdir -p ~/.claude/skills/radiology-paper-writer/references
 ```
 
-2. 스킬 파일 복사:
+2. Copy skill files:
 ```bash
-# SKILL.md와 references/ 디렉토리를 복사
 cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
 ```
 
-3. Claude Code에서 스킬 확인:
+3. Verify in Claude Code:
 ```bash
-claude-code
-# /radiology-draft, /radiology-review, /radiology-revise 명령어 사용 가능
+claude
+# /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands available
 ```
 
 ---
@@ -84,32 +95,32 @@ claude-code
 
 | Study Type | Description | Checklist |
 |------------|-------------|-----------|
-| `diagnostic_accuracy` | 진단 정확도 연구 | STARD 2015 + STARD-AI |
-| `prognostic` | 예후/예측 모델 연구 | TRIPOD + TRIPOD+AI |
-| `segmentation_ai` | AI 분할 연구 | CLAIM 2024 |
-| `screening` | 스크리닝 연구 | STARD + screening extensions |
-| `interventional` | 중재 영상의학 연구 | Custom criteria |
-| `llm_study` | LLM 활용 연구 | MI-CLEAR-LLM + TRIPOD-LLM + DEAL |
+| `diagnostic_accuracy` | Diagnostic accuracy study | STARD 2015 + STARD-AI |
+| `prognostic` | Prognostic/prediction model study | TRIPOD + TRIPOD+AI |
+| `segmentation_ai` | AI segmentation study | CLAIM 2024 |
+| `screening` | Screening study | STARD + screening extensions |
+| `interventional` | Interventional radiology study | Custom criteria |
+| `llm_study` | LLM-based study | MI-CLEAR-LLM + TRIPOD-LLM + DEAL |
 
 ### Supported Sections
 
-- **Title** - 제목 최적화
-- **Abstract** - 구조화된 초록 (Purpose/Methods/Results/Conclusion)
-- **Introduction** - 배경 및 목적
-- **Methods** - 방법론 (체크리스트 기반 검증)
-- **Results** - 결과 제시
-- **Discussion** - 고찰 및 제한점
-- **Conclusion** - 결론
-- **Cover Letter** - 투고 커버레터
+- **Title** — Title optimization
+- **Abstract** — Structured abstract (Purpose/Methods/Results/Conclusion)
+- **Introduction** — Background and objectives
+- **Methods** — Methodology (checklist-based validation)
+- **Results** — Result presentation
+- **Discussion** — Discussion and limitations
+- **Conclusion** — Conclusion
+- **Cover Letter** — Submission cover letter
 
 ### Key Capabilities
 
-- **Literature Research**: Gemini 3.1 Pro를 활용한 자동 문헌 검토 및 gap 분석
-- **Checklist Compliance**: STARD, TRIPOD, CLAIM 자동 검증
-- **Number Consistency**: Abstract-Results-Tables 수치 일치 확인
-- **Overclaim Detection**: "first", "novel", "superior" 등 과장 표현 감지
-- **Statistical Formatting**: 저널별 통계 표기 형식 검증
-- **Bilingual Support**: 영어/한국어 지원
+- **Literature Research**: Automated literature review and gap analysis via Gemini 3.1 Pro
+- **Checklist Compliance**: Automatic STARD, TRIPOD, CLAIM verification
+- **Number Consistency**: Abstract–Results–Tables number matching
+- **Overclaim Detection**: Flags "first", "novel", "superior" without evidence
+- **Statistical Formatting**: Journal-specific statistical notation validation
+- **Bilingual Support**: English and Korean
 
 ---
 
@@ -117,7 +128,7 @@ claude-code
 
 ### `/radiology-draft [section]`
 
-논문 섹션 초안을 작성합니다.
+Generates a draft for a paper section.
 
 ```
 /radiology-draft Methods
@@ -128,14 +139,14 @@ claude-code
 ```
 
 **Workflow:**
-1. 필수 정보 수집 (study type, journal, key findings)
-2. 섹션 템플릿 및 저널 프로파일 로드
-3. 초안 생성
-4. (선택) 즉시 리뷰 실행
+1. Collect required info (study type, journal, key findings)
+2. Load section template and journal profile
+3. Generate draft
+4. (Optional) Run immediate review
 
 ### `/radiology-intro [topic]`
 
-문헌 기반 Introduction 섹션을 작성합니다.
+Generates a literature-based Introduction section.
 
 ```
 /radiology-intro "Deep learning for liver metastasis detection on CT"
@@ -181,12 +192,12 @@ Research Topic + Keywords
 
 ### `/radiology-review [section]`
 
-기존 텍스트를 멀티모델로 리뷰합니다.
+Reviews existing text with multi-model feedback.
 
 ```
 /radiology-review Methods
 
-[Methods 섹션 텍스트 제공]
+[Provide Methods section text]
 ```
 
 **Parallel Review Process:**
@@ -206,7 +217,7 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 
 ### `/radiology-revise`
 
-리뷰 피드백을 반영하여 수정합니다.
+Revises draft based on review feedback.
 
 **Priority Order:**
 1. Critical methodology issues
@@ -218,7 +229,7 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 
 ## Output Format
 
-리뷰 결과는 구조화된 JSON으로 제공되며, `output/{section}_{timestamp}/` 디렉토리에 JSON과 Markdown 두 가지 형식으로 자동 저장됩니다 (자세한 내용은 [Output Files](#output-files) 참조):
+Review results are provided as structured JSON and automatically saved to `output/{section}_{timestamp}/` in both JSON and Markdown formats (see [Output Files](#output-files)):
 
 ```json
 {
@@ -252,50 +263,48 @@ GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
 
 ## Output Files
 
-리뷰 결과는 자동으로 `output/` 디렉토리에 JSON과 Markdown 두 가지 형식으로 저장됩니다.
+Review results are automatically saved to the `output/` directory in both JSON and Markdown formats.
 
-### 출력 디렉토리 구조
+### Directory Structure
 
 ```
 output/
 ├── methods_20260308_143022/
-│   ├── review_result.json       # 구조화된 JSON 리뷰 결과
-│   ├── review_report.md         # 사람이 읽기 쉬운 Markdown 리포트
-│   ├── codex_raw.json           # GPT-5.4 원본 응답 (성공 시)
-│   └── gemini_raw.json          # Gemini 원본 응답 (성공 시)
+│   ├── review_result.json       # Structured JSON review result
+│   ├── review_report.md         # Human-readable Markdown report
+│   ├── codex_raw.json           # Raw GPT-5.4 response (on success)
+│   └── gemini_raw.json          # Raw Gemini response (on success)
 ├── abstract_20260309_091500/
 │   ├── review_result.json
 │   ├── review_report.md
 │   └── ...
 ```
 
-### 파일 설명
+### File Descriptions
 
-| 파일 | 형식 | 설명 |
-|------|------|------|
-| `review_result.json` | JSON | 통합된 리뷰 결과 (major_issues, clarity_issues, checklist 등) |
-| `review_report.md` | Markdown | 헤더, 이슈 요약, 수정 제안, 체크리스트 현황 등 포함된 리포트 |
-| `codex_raw.json` | JSON | GPT-5.4의 원본 응답 (추적 및 디버깅용) |
-| `gemini_raw.json` | JSON | Gemini의 원본 응답 (추적 및 디버깅용) |
+| File | Format | Description |
+|------|--------|-------------|
+| `review_result.json` | JSON | Unified review result (major_issues, clarity_issues, checklist, etc.) |
+| `review_report.md` | Markdown | Report with header, issue summary, rewrite suggestions, checklist status |
+| `codex_raw.json` | JSON | Raw GPT-5.4 response (for traceability and debugging) |
+| `gemini_raw.json` | JSON | Raw Gemini response (for traceability and debugging) |
 
-### review_report.md 구성
+### review_report.md Structure
 
-생성되는 Markdown 리포트는 다음 섹션으로 구성됩니다:
+1. **Header** — Section type, study type, target journal, review date
+2. **Major Issues** — Sorted by severity (critical > major > minor), source attribution
+3. **Clarity Issues** — Readability/structure/flow issues with suggestions
+4. **Terminology & Consistency** — Terminology and consistency issues
+5. **Candidate Rewrites** — Original vs revised text comparison (with rationale)
+6. **Checklist Compliance** — Compliant/missing/incomplete items with compliance rate
+7. **Summary Statistics** — Issue count by severity, checklist compliance rate (%)
 
-1. **Header** - 섹션 유형, 연구 유형, 타깃 저널, 리뷰 일시
-2. **Major Issues** - 심각도순 정렬 (critical > major > minor), 모델 출처 표시
-3. **Clarity Issues** - 가독성/구조/흐름 이슈 및 개선 제안
-4. **Terminology & Consistency** - 용어 및 일관성 이슈
-5. **Candidate Rewrites** - 원문 vs 수정안 비교 (근거 포함)
-6. **Checklist Compliance** - 준수/누락/불완전 항목 및 준수율
-7. **Summary Statistics** - 심각도별 이슈 수, 체크리스트 준수율 (%)
+### Directory Conventions
 
-### 디렉토리 규칙
-
-- 모든 출력은 프로젝트 루트의 `output/` 디렉토리 아래에 생성됩니다
-- 각 리뷰 세션마다 새로운 타임스탬프 디렉토리가 생성됩니다
-- 이전 결과는 덮어쓰지 않습니다
-- 디렉토리 이름: `{섹션}_{YYYYMMDD_HHMMSS}` (예: `methods_20260308_143022`)
+- All outputs are created under `output/` in the project root
+- Each review session creates a new timestamped directory
+- Previous results are never overwritten
+- Directory naming: `{section}_{YYYYMMDD_HHMMSS}` (e.g., `methods_20260308_143022`)
 
 ---
 
@@ -360,21 +369,21 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 - Gemini prompts: Korean style guidelines added
 - Output feedback: Korean
 - Korean-specific rules:
-  - 존댓말 일관성
-  - 영어 의학용어 vs 한글 용어 선택
-  - 문장 길이: 40자 이내 권장
+  - Consistent honorific style
+  - English medical terms vs Korean terms selection
+  - Sentence length: under 40 characters recommended
 
 ---
 
 ## Best Practices
 
-1. **Always validate numbers** - Abstract numbers must match Results/Tables
-2. **Check for overclaims** - Avoid "first", "novel", "superior" without evidence
-3. **Statistical formatting** - Follow journal style (OR [95% CI], p-values)
-4. **Reference standard** - Ensure adequacy for diagnostic studies
-5. **Patient selection** - Explicit, reproducible criteria
-6. **Blinding** - Document reader blinding appropriately
-7. **Limitations** - Address all major limitations honestly
+1. **Always validate numbers** — Abstract numbers must match Results/Tables
+2. **Check for overclaims** — Avoid "first", "novel", "superior" without evidence
+3. **Statistical formatting** — Follow journal style (OR [95% CI], p-values)
+4. **Reference standard** — Ensure adequacy for diagnostic studies
+5. **Patient selection** — Explicit, reproducible criteria
+6. **Blinding** — Document reader blinding appropriately
+7. **Limitations** — Address all major limitations honestly
 
 ---
 
@@ -383,7 +392,8 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 ```
 ~/.claude/skills/radiology-paper-writer/
 ├── SKILL.md                          # Main skill definition
-├── README.md                         # This documentation
+├── README.md                         # English documentation
+├── README.ko.md                      # Korean documentation
 ├── IMPLEMENTATION_PLAN.md            # Development roadmap
 ├── references/
 │   ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
@@ -415,7 +425,7 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 
 ## Contributing
 
-이 스킬에 대한 피드백이나 개선 제안은 언제든 환영합니다.
+Feedback and improvement suggestions for this skill are always welcome.
 
 ---
 
@@ -430,3 +440,6 @@ MIT License
 - STARD Initiative (Standards for Reporting Diagnostic Accuracy)
 - TRIPOD Group (Transparent Reporting of a multivariable prediction model)
 - CLAIM Checklist (Checklist for Artificial Intelligence in Medical Imaging)
+- MI-CLEAR-LLM (Medical Imaging Checklist for LLM Evaluation and Reporting)
+- TRIPOD-LLM (Transparent Reporting of LLM Prediction Models)
+- DEAL (Developing and Evaluating LLMs)
