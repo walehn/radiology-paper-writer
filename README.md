@@ -1,8 +1,8 @@
 # Radiology Paper Writer
 
-> AI-assisted radiology research paper writing with multi-model review system
+> AI-assisted radiology research paper writing with a 3-model review system
 
-영상의학 연구 논문 작성 및 교정을 위한 Claude Code 스킬입니다. 네 가지 AI 모델이 협업하여 학술 논문의 문헌 리서치, 초안 작성, 방법론 검토, 문체 교정까지 체계적으로 지원합니다.
+영상의학 연구 논문 작성 및 교정을 위한 Claude Code 스킬입니다. 세 가지 AI 역할이 협업하여 학술 논문의 문헌 리서치, 초안 작성, 방법론 검토, 문체 교정까지 체계적으로 지원합니다.
 
 ---
 
@@ -11,33 +11,37 @@
 ### The Problem
 
 영상의학 연구 논문 작성 시 흔히 겪는 어려움:
-- STARD, TRIPOD, CLAIM 등 복잡한 체크리스트 준수
+- STARD, TRIPOD, CLAIM, MI-CLEAR-LLM 등 복잡한 체크리스트 준수
 - 통계 수치의 일관성 유지 (Abstract ↔ Results ↔ Tables)
 - 방법론적 엄밀성과 가독성의 균형
 - 저널별 다른 포맷 요구사항
 
 ### The Solution
 
-**Multi-Model System**: 각 모델이 전문 분야에 집중
+**3-Model System**: 각 역할이 전문 분야에 집중.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Claude Code (Main Editor)                 │
-│         초안 작성 · 피드백 통합 · 수정 · 버전 관리            │
-└─────────────────────────────────────────────────────────────┘
-                              │
-       ┌──────────────────────┼──────────────────────┐
-       ▼                      ▼                      ▼
-┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│ GPT-5.2          │  │ Gemini 3.0 Pro   │  │ Gemini 3 Pro     │
-│ (reasoning: high)│  │ Style Reviewer   │  │ Lit. Researcher  │
-├──────────────────┤  ├──────────────────┤  ├──────────────────┤
-│ • 연구 설계 검증 │  │ • 문장 자연스러움│  │ • 문헌 검토      │
-│ • 통계 분석      │  │ • 가독성 향상    │  │ • Gap 분석       │
-│ • 논리적 일관성  │  │ • 저널 스타일    │  │ • 인용 제안      │
-│ • 방법론 체크    │  │ • Clarity 개선   │  │ • 배경 연구      │
-└──────────────────┘  └──────────────────┘  └──────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│           Claude Code  (Main Editor + Style Reviewer)             │
+│  Draft · Style review (native) · URL verify (WebSearch/Fetch)     │
+│             Feedback integration · Revision · History             │
+└───────────────────────────────────────────────────────────────────┘
+                                 │
+                 ┌───────────────┴────────────────┐
+                 ▼                                ▼
+     ┌────────────────────────┐      ┌────────────────────────┐
+     │ Codex GPT-5.4          │      │ Codex GPT-5.4          │
+     │ (reasoning: high)      │      │ (reasoning: high)      │
+     │ Technical Reviewer     │      │ Literature Researcher  │
+     ├────────────────────────┤      ├────────────────────────┤
+     │ • Study design         │      │ • Prior work synthesis │
+     │ • Statistical rigor    │      │ • Citation hints       │
+     │ • Methodological bias  │      │ • Expected domains     │
+     │ • Checklist compliance │      │ • Research gap analysis│
+     └────────────────────────┘      └────────────────────────┘
 ```
+
+Only three roles exist. Style review runs inside Claude; literature research runs via Codex and is verified by Claude WebSearch and WebFetch.
 
 ---
 
@@ -52,12 +56,13 @@
 | `segmentation_ai` | AI 분할 연구 | CLAIM 2024 |
 | `screening` | 스크리닝 연구 | STARD + screening extensions |
 | `interventional` | 중재 영상의학 연구 | Custom criteria |
+| `llm_study` | LLM 활용 연구 | MI-CLEAR-LLM + TRIPOD-LLM + DEAL |
 
 ### Supported Sections
 
 - **Title** - 제목 최적화
 - **Abstract** - 구조화된 초록 (Purpose/Methods/Results/Conclusion)
-- **Introduction** - 배경 및 목적
+- **Introduction** - 배경 및 목적 (2-stage literature pipeline)
 - **Methods** - 방법론 (체크리스트 기반 검증)
 - **Results** - 결과 제시
 - **Discussion** - 고찰 및 제한점
@@ -66,12 +71,12 @@
 
 ### Key Capabilities
 
-- **Literature Research**: Gemini 3 Pro를 활용한 자동 문헌 검토 및 gap 분석
-- **Checklist Compliance**: STARD, TRIPOD, CLAIM 자동 검증
+- **Literature Research**: Codex GPT-5.4 (reasoning: high) 기반 구조화된 문헌 분석 + Claude WebSearch/WebFetch URL 검증
+- **Checklist Compliance**: STARD, TRIPOD, CLAIM, MI-CLEAR-LLM 자동 검증
 - **Number Consistency**: Abstract-Results-Tables 수치 일치 확인
 - **Overclaim Detection**: "first", "novel", "superior" 등 과장 표현 감지
 - **Statistical Formatting**: 저널별 통계 표기 형식 검증
-- **Bilingual Support**: 영어/한국어 지원
+- **Bilingual Support**: 영어/한국어 지원 (한국어 → 영어 가이드라인 내장)
 
 ---
 
@@ -79,7 +84,7 @@
 
 ### `/radiology-draft [section]`
 
-논문 섹션 초안을 작성합니다.
+논문 섹션 초안을 작성합니다 (Claude-only).
 
 ```
 /radiology-draft Methods
@@ -92,12 +97,12 @@
 **Workflow:**
 1. 필수 정보 수집 (study type, journal, key findings)
 2. 섹션 템플릿 및 저널 프로파일 로드
-3. 초안 생성
-4. (선택) 즉시 리뷰 실행
+3. 초안 생성 (Claude native)
+4. (선택) 즉시 리뷰 실행 → /radiology-review 호출
 
 ### `/radiology-intro [topic]`
 
-문헌 기반 Introduction 섹션을 작성합니다.
+문헌 기반 Introduction 섹션을 2단계 파이프라인으로 작성합니다.
 
 ```
 /radiology-intro "Deep learning for liver metastasis detection on CT"
@@ -107,43 +112,61 @@
 > Target journal: Radiology
 ```
 
-**Literature Research Workflow:**
+**Literature Pipeline:**
+
 ```
 Research Topic + Keywords
           │
           ▼
-┌─────────────────────────┐
-│ Gemini 3 Pro            │
-│ Literature Analysis     │
-├─────────────────────────┤
-│ • Clinical context      │
-│ • Key literature        │
-│ • Knowledge gaps        │
-│ • Citation suggestions  │
-└─────────────────────────┘
+┌─────────────────────────────┐
+│ Stage 1 — Codex GPT-5.4     │
+│ Literature Analysis         │
+│ (reasoning: high)           │
+├─────────────────────────────┤
+│ • prior_work                │
+│ • citation_hints            │
+│   (suggested_query,         │
+│    expected_domains)        │
+│ • research_gap_analysis     │
+│ • suggested structure       │
+└─────────────────────────────┘
           │
           ▼
-┌─────────────────────────┐
-│ Claude                  │
-│ Introduction Draft      │
-├─────────────────────────┤
-│ P1: Clinical Context    │
-│ P2: Gap/Limitation      │
-│ P3: Objective           │
-└─────────────────────────┘
+┌─────────────────────────────┐
+│ Stage 2 — Claude            │
+│ WebSearch + WebFetch        │
+├─────────────────────────────┤
+│ For each citation_hint:     │
+│  • WebSearch(query)         │
+│  • Filter by domain         │
+│  • WebFetch verification    │
+│  • Attach verified_url      │
+│ On failure:                 │
+│  stage2_verification_failed │
+│  = true  (return Stage 1)   │
+└─────────────────────────────┘
           │
           ▼
-┌─────────────────────────┐
-│ Dual Review (Optional)  │
-├─────────────────────────┤
-│ GPT-5.2: Gap alignment  │
-│ Gemini: Flow, clarity   │
-└─────────────────────────┘
+┌─────────────────────────────┐
+│ Claude Introduction Draft   │
+├─────────────────────────────┤
+│ P1: Clinical Context        │
+│ P2: Gap/Limitation          │
+│ P3: Objective               │
+└─────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ Dual Review (Optional)      │
+├─────────────────────────────┤
+│ Codex GPT-5.4: Gap align.   │
+│ Claude native: Flow, clarity│
+└─────────────────────────────┘
 ```
 
 ### `/radiology-review [section]`
 
-기존 텍스트를 멀티모델로 리뷰합니다.
+기존 텍스트를 3-step 파이프라인으로 리뷰합니다.
 
 ```
 /radiology-review Methods
@@ -151,24 +174,37 @@ Research Topic + Keywords
 [Methods 섹션 텍스트 제공]
 ```
 
-**Parallel Review Process:**
+**Sequential Review Process:**
+
 ```
-GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
-        │                                │
-        ▼                                ▼
-  Technical Issues                 Style Issues
-  - Patient selection bias         - Paragraph organization
-  - Reference standard adequacy    - Verb tense consistency
-  - Statistical rigor              - Readability score
-        │                                │
-        └────────────┬───────────────────┘
-                     ▼
-            Unified Feedback JSON
+Step 1: Codex GPT-5.4 Technical
+         (reasoning: high)
+          │
+          ▼
+  • Patient selection bias
+  • Reference standard adequacy
+  • Statistical rigor
+  • Checklist compliance
+          │
+          ▼
+Step 2: Claude Native Style
+          │
+          ▼
+  • Paragraph organization
+  • Verb tense consistency
+  • Readability
+  • Terminology consistency
+          │
+          ▼
+Step 3: Unified JSON Merge
+          │
+          ▼
+  review_result.json + review_report.md
 ```
 
 ### `/radiology-revise`
 
-리뷰 피드백을 반영하여 수정합니다.
+리뷰 피드백을 반영하여 수정합니다 (Claude-only).
 
 **Priority Order:**
 1. Critical methodology issues
@@ -180,7 +216,7 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
 
 ## Output Format
 
-리뷰 결과는 구조화된 JSON으로 제공됩니다:
+리뷰 결과는 구조화된 JSON으로 제공됩니다. JSON 키는 이전 버전과 완전 호환되며 `source` 필드 값만 `"claude"` 또는 `"gpt-5.4"`로 정정되었습니다.
 
 ```json
 {
@@ -190,7 +226,7 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
       "location": "Patient Selection, paragraph 2",
       "description": "Eligibility criteria not explicitly stated",
       "severity": "critical",
-      "source": "gpt-5.2"
+      "source": "gpt-5.4"
     }
   ],
   "clarity_issues": [
@@ -198,7 +234,23 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
       "type": "readability",
       "location": "Statistical Analysis, sentence 3",
       "suggestion": "Break into two sentences for clarity",
-      "source": "gemini"
+      "source": "claude"
+    }
+  ],
+  "terminology_and_consistency": [
+    {
+      "term": "deep learning",
+      "locations": ["Methods para 1", "Methods para 4"],
+      "canonical_form": "Define DL on first use; use DL thereafter.",
+      "source": "claude"
+    }
+  ],
+  "candidate_rewrites": [
+    {
+      "location": "Methods, Statistical Analysis, sentence 3",
+      "original": "...",
+      "revised": "...",
+      "rationale": "Split for readability"
     }
   ],
   "checklist": {
@@ -216,7 +268,7 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
 
 ### Methods Section Example
 
-| GPT-5.2 (Technical) | Gemini (Style) |
+| GPT-5.4 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -233,8 +285,9 @@ GPT-5.2 (reasoning: high)          Gemini 3.0 Pro
 ### Prerequisites
 
 - [Claude Code](https://claude.ai/claude-code) CLI 설치
-- [Codex CLI](https://github.com/openai/codex) 설치 및 OpenAI API 키 설정
-- [Gemini CLI](https://github.com/google/gemini-cli) 설치 및 Google API 키 설정
+- [Codex CLI](https://github.com/openai/codex) 설치 및 OpenAI API 키 설정 (GPT-5.4 접근 필요)
+
+No other external CLI is required. Claude's native tools (WebSearch, WebFetch) handle URL verification.
 
 ### Setup
 
@@ -252,7 +305,7 @@ cp -r radiology-paper-writer/* ~/.claude/skills/radiology-paper-writer/
 3. Claude Code에서 스킬 확인:
 ```bash
 claude-code
-# /radiology-draft, /radiology-review, /radiology-revise 명령어 사용 가능
+# /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise 명령어 사용 가능
 ```
 
 ---
@@ -261,33 +314,32 @@ claude-code
 
 ### Model Configuration
 
-| Model | CLI | Parameters | Purpose |
-|-------|-----|------------|---------|
-| GPT-5.2 | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Technical Review |
-| Gemini 3.0 Pro | Gemini | `-y` (auto-approve) | Style Review |
-| Gemini 3 Pro | Gemini | `-m gemini-3-pro -y` | Literature Research |
+| Role | CLI | Parameters | Purpose |
+|------|-----|------------|---------|
+| Claude Code | (native, no CLI) | — | Drafting, style review, URL verification, revision |
+| Codex GPT-5.4 Technical | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Methodological review |
+| Codex GPT-5.4 Literature | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Introduction literature analysis (Stage 1) |
 
 ### Execution Commands
 
 ```bash
-# GPT-5.2 Technical Review
-codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+# Technical review (GPT-5.4, high reasoning)
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
 
-# Gemini Style Review
-gemini -y "[prompt]"
-
-# Gemini 3 Pro Literature Research
-gemini -m gemini-3-pro -y "[research prompt]"
+# Literature analysis (GPT-5.4, high reasoning, Stage 1 of /radiology-intro)
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[literature prompt]"
 ```
+
+Claude native operations (style review, URL verification, draft generation, revision) do not shell out.
 
 ### Error Handling
 
 | Scenario | Action |
 |----------|--------|
-| GPT-5.2 timeout/failure | Retry once, then Claude-only review |
-| Gemini error | Continue with GPT-5.2 review only |
-| Both CLI failures | Claude provides basic review |
-| Invalid JSON response | Extract text feedback, present as unstructured |
+| Codex invocation failure | Retry once, then fallback to Claude-only review with `"fallback": "claude_only"` notice in output JSON |
+| Stage 2 URL verification failure | Return Stage 1 results unchanged + `stage2_verification_failed: true` |
+| Invalid JSON response | Extract text feedback, present as unstructured in `review_report.md` |
+| Empty input draft | Prompt user before running any reviewer |
 
 ---
 
@@ -298,9 +350,9 @@ gemini -m gemini-3-pro -y "[research prompt]"
 - Checklists in English
 
 ### Korean (`language="ko"`)
-- GPT-5.2 prompts: English (technical consistency)
-- Gemini prompts: Korean style guidelines added
-- Output feedback: Korean
+- Codex prompts: English (technical consistency)
+- Claude native style review: applies Korean-to-English guidelines from the style guidance header
+- Output feedback: Korean when requested
 - Korean-specific rules:
   - 존댓말 일관성
   - 영어 의학용어 vs 한글 용어 선택
@@ -326,13 +378,12 @@ gemini -m gemini-3-pro -y "[research prompt]"
 ~/.claude/skills/radiology-paper-writer/
 ├── SKILL.md                          # Main skill definition
 ├── README.md                         # This documentation
-├── IMPLEMENTATION_PLAN.md            # Development roadmap
+├── IMPLEMENTATION_PLAN.md            # Development roadmap and changelog
 └── references/
-    ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
+    ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM, MI-CLEAR-LLM checklists
     ├── section-templates.md          # Section-specific templates
     ├── journal-profiles.md           # Journal requirements
-    ├── codex-prompts.md              # GPT-5.2 review prompts
-    └── gemini-prompts.md             # Gemini review prompts
+    └── codex-prompts.md              # GPT-5.4 review prompts + Introduction Literature Analysis + Style Guidance for Claude Native Review
 ```
 
 ---
@@ -364,3 +415,4 @@ MIT License
 - STARD Initiative (Standards for Reporting Diagnostic Accuracy)
 - TRIPOD Group (Transparent Reporting of a multivariable prediction model)
 - CLAIM Checklist (Checklist for Artificial Intelligence in Medical Imaging)
+- MI-CLEAR-LLM (Medical Imaging — Clear Reporting of LLM studies)

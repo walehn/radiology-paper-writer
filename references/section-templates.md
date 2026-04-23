@@ -36,7 +36,7 @@
 | **Statistical Format** | OR/HR with 95% CI, p-value format | Minor |
 | **Sample Size** | Is n clearly stated? | Minor |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -94,26 +94,26 @@
 - Study type (diagnostic_accuracy, prognostic, segmentation_ai)
 - Target journal
 
-**Step 2: Gemini 3 Pro Literature Analysis**
+**Step 2: Codex GPT-5.4 Literature Analysis (Stage 1)**
 ```bash
-gemini -m gemini-3-pro -y "[Research Prompt]"
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[Introduction Literature Analysis prompt from references/codex-prompts.md]"
 ```
 Output includes:
-- Clinical context summary
-- Key literature with citation hints
-- State-of-the-art methods
-- Knowledge gaps identified
-- Research opportunity analysis
+- Prior work synthesis with citation hints
+- Citation hints with suggested_query and expected_domains
+- Research gap analysis (specific gaps, severity, how addressed)
 - Suggested paragraph drafts
 
+**Stage 2: Claude URL Verification** - Claude uses WebSearch + WebFetch to verify citation URLs. On failure, Stage 1 results are returned with `stage2_verification_failed: true`.
+
 **Step 3: Draft Generation (Claude)**
-- Synthesize Gemini research output
+- Synthesize Codex literature analysis output (plus Claude-verified URLs when Stage 2 succeeded)
 - Generate 3-paragraph Introduction
 - Integrate suggested citations
 
 **Step 4: Dual Review (Optional)**
-- GPT-5.2: Clinical relevance, gap clarity, objective alignment
-- Gemini: Flow, readability, citation integration
+- GPT-5.4: Clinical relevance, gap clarity, objective alignment
+- Claude native: Flow, readability, citation integration
 
 ### Paragraph-Specific Guidelines
 
@@ -187,7 +187,7 @@ Output includes:
 | Prognostic | develop, validate, evaluate predictive value of |
 | Comparative | compare, assess superiority/noninferiority of |
 
-### Technical Review Criteria (GPT-5.2)
+### Technical Review Criteria (GPT-5.4)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -199,7 +199,7 @@ Output includes:
 | **Scope Appropriateness** | Are claims proportionate to study design? | Major |
 | **Overclaim Detection** | Avoid "first", "novel", "unique" without evidence | Major |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -302,7 +302,7 @@ reducing interpretation time.
 | **Inter-reader Agreement** | ICC/Kappa reported? | Major |
 | **ROC Analysis** | AUC with CI? Threshold selection method? | Major |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -345,7 +345,7 @@ reducing interpretation time.
 | **Missing Data** | Handling explained? | Minor |
 | **Negative Results** | Reported without spin? | Minor |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -407,7 +407,7 @@ ICC: 0.89 (95% CI: 0.82-0.94)
 | **Generalizability** | External validity discussed? | Major |
 | **Conclusion Scope** | Not exceeding what data show? | Critical |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|
@@ -437,7 +437,7 @@ ICC: 0.89 (95% CI: 0.82-0.94)
 | **No New Information** | Nothing not discussed earlier? | Major |
 | **No Overclaim** | Tempered language? | Critical |
 
-### Style Review Criteria (Gemini)
+### Style Review Criteria (Claude)
 
 | Category | Check | Severity |
 |----------|-------|----------|

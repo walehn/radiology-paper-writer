@@ -1,12 +1,63 @@
-# Codex (GPT-5.2) Review Prompts
+# Codex (GPT-5.4) Review Prompts
 
-Technical and methodological review prompts for GPT-5.2 via Codex CLI
+Technical, methodological, and literature review prompts for GPT-5.4 via Codex CLI, plus style guidance for Claude native review.
 
 ## Usage
 
 ```bash
-codex exec -m gpt-5.2 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+# Technical or methodological review (high reasoning)
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+
+# Literature analysis for Introduction (Stage 1 of /radiology-intro)
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[LITERATURE PROMPT]"
 ```
+
+---
+
+## Style Guidance for Claude Native Review
+
+> This header block is consumed by Claude itself during /radiology-review Step 2 (Claude Native Style Review). It is NOT sent to an external CLI. Claude loads these criteria directly and applies them to the draft.
+
+### Medical Writing Criteria (applies to all sections)
+
+- Sentence brevity: flag sentences longer than 25 words; suggest splits or rewrites.
+- Information density: one key message per sentence; eliminate redundant or filler phrases.
+- Clinical readability: a general radiologist should understand each sentence on first read; simplify unnecessary jargon; define acronyms on first use.
+- Voice and tone: prefer active voice; maintain scholarly but accessible tone; keep tense consistent within each section.
+- Word count: respect journal limits; propose concrete cuts when exceeded.
+- Journal style: match the target journal's abstract format, section headers, and statistical formatting conventions.
+
+### Korean-to-English Guidelines (applies when authors are Korean)
+
+- Sentence structure: detect long, complex constructions typical of Korean source writing; split into shorter English sentences; supply missing subjects.
+- Article usage: check for missing or misused a/an/the; suggest corrections with rationale.
+- Verb issues: enforce subject-verb agreement, consistent past tense in Methods and Results, and reduce unnecessary passive voice.
+- Preposition usage: flag incorrect or missing prepositions (in/on/at/by/with/of) common in Korean-to-English translation.
+- Word choice: identify direct translations that sound unnatural in medical English; propose idiomatic replacements; pair Korean medical terms with their standard English equivalents.
+- Formality: maintain academic register; flag overly colloquial or overly formal phrasing.
+
+### Passive Voice Handling
+
+- Methods section: passive voice is acceptable and often preferred (for example, "images were acquired", "readers were blinded"). Do NOT flag passive voice here.
+- Abstract, Introduction, Results, Discussion: prefer active voice where natural; flag passive constructions that obscure the agent or add unnecessary length.
+- Always provide an active-voice rewrite suggestion when flagging passive voice.
+
+### Terminology Consistency
+
+- Track every technical term, acronym, and measurement used in the draft.
+- Flag inconsistencies such as mixing "deep learning" and "DL" without defining DL on first use, or alternating between "liver metastasis" and "hepatic metastasis".
+- Flag inconsistent decimal places in numerical reporting (for example, "0.92" vs "0.920" in the same section).
+- Flag inconsistent unit formatting (for example, percent sign vs the word "percent").
+- Recommend a single canonical form and apply it throughout.
+
+### Output Contract for Claude Native Style Review
+
+Claude emits a JSON object with the following keys (merged with Codex output downstream):
+
+- `clarity_issues`: readability, structure, flow items with `suggestion` and `source: "claude"`.
+- `terminology_and_consistency`: items listing the inconsistent term, its locations, and the canonical form; `source: "claude"`.
+- `candidate_rewrites`: `original`, `revised`, `rationale`; no `source` field at item level (the rewrite is authorial).
+- `overall_assessment`: `ready` | `minor_revisions` | `major_revisions`.
 
 ---
 
@@ -538,3 +589,110 @@ Review against {checklist_type} checklist:
 
 Report compliance status for each item in JSON.
 ```
+
+## Introduction Literature Analysis Prompt
+
+**Model:** GPT-5.4 via Codex CLI
+**Purpose:** Literature review and knowledge gap analysis for Introduction writing (Stage 1 of /radiology-intro).
+**Reasoning parameter:** `model_reasoning_effort=high`
+
+**Invocation:**
+
+```bash
+codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+```
+
+**Inputs:**
+
+- `{topic}`: research topic (for example, "Deep learning for liver metastasis detection on CT")
+- `{keywords}`: comma-separated list of topic keywords (for example, "liver metastasis, CT, deep learning, diagnostic accuracy")
+- `{study_type}`: one of diagnostic_accuracy, prognostic, segmentation_ai, screening, interventional, llm_study
+- `{journal_name}`: target journal profile
+- `{introduction_draft}`: optional existing Introduction draft; when absent, the prompt synthesizes from topic and keywords alone
+
+**Prompt body:**
+
+```
+You are a radiology research expert conducting a comprehensive literature analysis for the Introduction section of a manuscript.
+
+Think step-by-step through the literature landscape.
+First, identify the most impactful prior work in this area.
+Then, analyze what questions remain unanswered.
+Finally, propose citation hints and a research gap synthesis.
+
+RESEARCH TOPIC: {topic}
+KEYWORDS: {keywords}
+STUDY TYPE: {study_type}
+TARGET JOURNAL: {journal_name}
+
+INTRODUCTION DRAFT (optional):
+---
+{introduction_draft}
+---
+
+### Required Analysis
+
+## 1. PRIOR WORK
+- Key landmark studies in this area (author names and approximate years when known)
+- State-of-the-art methods and their reported performance
+- Consensus points and active controversies
+- Recent trends
+
+## 2. CITATION HINTS
+For each hint, provide:
+- suggested_query: PubMed / Google Scholar style search query
+- expected_domains: list of likely source venues or domains (for example, "Radiology", "Radiology: AI", "European Radiology", "Lancet Digital Health", "arxiv.org")
+- rationale: what aspect of the Introduction the citation supports
+
+## 3. RESEARCH GAP ANALYSIS
+- Specific limitations of existing studies (sample size, methodology, generalizability)
+- Unaddressed clinical questions
+- How the proposed study fills the gap
+- Expected clinical impact
+
+### Output Format (strict JSON)
+
+{
+  "prior_work": [
+    {
+      "citation_hint": "Author et al., Year (approximate)",
+      "study_type": "diagnostic accuracy | cohort | meta-analysis | RCT | technical",
+      "key_finding": "Main result or conclusion",
+      "sample_size": "approximate if known",
+      "relevance": "Why this study is important for context"
+    }
+  ],
+  "citation_hints": [
+    {
+      "suggested_query": "PubMed or Scholar search query",
+      "expected_domains": ["example.com", "pubmed.ncbi.nlm.nih.gov", "Radiology"],
+      "rationale": "Which Introduction claim this citation supports"
+    }
+  ],
+  "research_gap_analysis": {
+    "specific_gaps": [
+      {
+        "gap_description": "Specific gap in current knowledge",
+        "why_important": "Why this gap matters",
+        "severity": "critical | major | minor"
+      }
+    ],
+    "how_study_addresses_gap": "How the proposed study fills the gap",
+    "novelty": "What makes this approach new or different",
+    "expected_contribution": "Anticipated impact on the field",
+    "clinical_translation": "Potential for clinical application"
+  },
+  "suggested_introduction_structure": {
+    "paragraph_1_clinical_context": "Draft sentences for clinical background with inline citation hints",
+    "paragraph_2_literature_and_gap": "Draft sentences for existing research and limitations with inline citation hints",
+    "paragraph_3_objective": "Draft objective statement aligned to the identified gap"
+  },
+  "source": "gpt-5.4"
+}
+```
+
+**Stage 2 (Claude URL verification) handoff:**
+
+Claude consumes `citation_hints[*].suggested_query` and `expected_domains`, then executes WebSearch followed by WebFetch to verify URLs. On Stage 2 failure, Claude returns Stage 1 results unchanged plus `stage2_verification_failed: true`.
+
+---

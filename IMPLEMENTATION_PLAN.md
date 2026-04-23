@@ -10,8 +10,8 @@
 
 **핵심 구조:**
 - Claude Code: 메인 에디터 (초안 작성, 피드백 통합, 수정)
-- GPT 5.2 (Codex CLI): 기술/논리/방법론 리뷰어
-- Gemini 3.0 Pro (Gemini CLI): 스타일/가독성/저널 스타일 리뷰어
+- GPT 5.4 (Codex CLI): 기술/논리/방법론 리뷰어
+- Gemini 3.1 Pro (Gemini CLI): 스타일/가독성/저널 스타일 리뷰어
 
 ---
 
@@ -25,7 +25,7 @@
 │   ├── radiology-checklists.md        # STARD, TRIPOD, CLAIM-AI
 │   ├── section-templates.md           # 섹션별 리뷰 기준
 │   ├── journal-profiles.md            # 저널별 요구사항
-│   ├── codex-prompts.md               # GPT-5.2 리뷰 프롬프트
+│   ├── codex-prompts.md               # GPT-5.4 리뷰 프롬프트
 │   └── gemini-prompts.md              # Gemini 리뷰 프롬프트
 ```
 
@@ -41,7 +41,7 @@
 ```yaml
 ---
 name: radiology-paper-writer
-description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.2 reviews methodology, Gemini reviews style. Supports STARD/TRIPOD/CLAIM checklists. Triggers: /radiology-draft, /radiology-review, /radiology-revise
+description: AI-assisted radiology research paper writing with multi-model review. Claude drafts, GPT-5.4 reviews methodology, Gemini reviews style. Supports STARD/TRIPOD/CLAIM checklists. Triggers: /radiology-draft, /radiology-review, /radiology-revise
 ---
 ```
 
@@ -96,7 +96,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 
 **File:** `references/codex-prompts.md`
 
-**Per-section prompts for GPT-5.2:**
+**Per-section prompts for GPT-5.4:**
 - JSON 출력 형식 지정
 - 기술적 평가 항목 명시
 - checklist compliance 확인
@@ -132,7 +132,7 @@ description: AI-assisted radiology research paper writing with multi-model revie
 3. Parallel Review (Optional)
    ┌─────────────────┐  ┌─────────────────┐
    │ Codex Technical │  │ Gemini Style    │
-   │ codex exec ...  │  │ gemini -y ...   │
+   │ codex exec ...  │  │ gemini --approval-mode yolo ...   │
    └─────────────────┘  └─────────────────┘
 
 4. Integration (Claude)
@@ -147,8 +147,8 @@ description: AI-assisted radiology research paper writing with multi-model revie
 1. Parse draft_text
 2. Determine checklist (STARD/TRIPOD/CLAIM)
 3. Parallel execution:
-   - Codex: codex exec -m gpt-5.2 --sandbox read-only "[prompt]"
-   - Gemini: gemini -y "[prompt]"
+   - Codex: codex exec -m gpt-5.4 --sandbox read-only "[prompt]"
+   - Gemini: gemini --approval-mode yolo "[prompt]"
 4. Parse & merge responses
 5. Present unified feedback
 ```
@@ -169,13 +169,13 @@ description: AI-assisted radiology research paper writing with multi-model revie
 
 **Codex:**
 ```bash
-codex exec -m gpt-5.2 --sandbox read-only "[prompt with draft]"
+codex exec -m gpt-5.4 --sandbox read-only "[prompt with draft]"
 codex exec resume --last "[follow-up]"
 ```
 
 **Gemini:**
 ```bash
-gemini -y "[prompt with draft]"
+gemini --approval-mode yolo "[prompt with draft]"
 ```
 
 ---
@@ -233,7 +233,7 @@ gemini -y "[prompt with draft]"
 | 2 | references/radiology-checklists.md | STARD/TRIPOD/CLAIM 체크리스트 | ✅ |
 | 3 | references/section-templates.md | 섹션별 리뷰 기준 | ✅ |
 | 4 | references/journal-profiles.md | 저널별 요구사항 | ✅ |
-| 5 | references/codex-prompts.md | GPT-5.2 프롬프트 | ✅ |
+| 5 | references/codex-prompts.md | GPT-5.4 프롬프트 | ✅ |
 | 6 | references/gemini-prompts.md | Gemini 프롬프트 | ✅ |
 
 ---
@@ -253,3 +253,23 @@ gemini -y "[prompt with draft]"
 - [ ] 그래픽 초록 생성 지원
 - [ ] 투고 전 최종 체크리스트 자동 생성
 - [ ] 리비전 대응 지원 (reviewer comment → response draft)
+
+---
+
+## Changelog
+
+### 2026-04-23 — Refactor: 4-model → 3-model architecture
+
+Refactor — Removed Gemini CLI dependency, migrated style review to Claude native, migrated literature research to Codex GPT-5.4 Stage 1 + Claude WebSearch Stage 2.
+
+**4-model → 3-model architecture transition summary:**
+
+- Before (4 roles): Claude Main Editor, Codex GPT-5.4 Technical Reviewer, Gemini 3.1 Pro Style Reviewer, Gemini 3.1 Pro Literature Researcher.
+- After (3 roles): Claude Code (Main Editor + Style Reviewer), Codex GPT-5.4 Technical Reviewer, Codex GPT-5.4 Literature Researcher.
+- Style review: moved from Gemini CLI to Claude native. The style criteria are now captured in `references/codex-prompts.md` under the header "Style Guidance for Claude Native Review" (medical writing criteria, Korean-to-English guidelines, passive voice handling, terminology consistency).
+- Literature research: moved from Gemini 3.1 Pro to Codex GPT-5.4 with `model_reasoning_effort=high`. A new "Introduction Literature Analysis" prompt was added to `references/codex-prompts.md` producing `prior_work`, `citation_hints` (with `suggested_query` and `expected_domains`), and `research_gap_analysis`.
+- `/radiology-intro` pipeline: now Stage 1 (Codex literature analysis) → Stage 2 (Claude WebSearch + WebFetch URL verification). On Stage 2 failure, Stage 1 results are returned with `stage2_verification_failed: true` and no error is raised (per OQ-1).
+- Output JSON: schema keys preserved (`major_issues`, `clarity_issues`, `terminology_and_consistency`, `candidate_rewrites`, `checklist`). The `source` field value set transitions from `{"gemini", "gpt-5.4"}` to `{"claude", "gpt-5.4"}`. No combined values are emitted (per OQ-2).
+- Error handling: the "Gemini timeout / API error / CLI not found" rows were removed. A single "Codex invocation failure" row was added with strategy "Fallback to Claude-only review with explicit notice in output JSON." No Gemini fallback path exists.
+- Deleted file: `references/gemini-prompts.md`. Its style-relevant content was migrated into the Style Guidance header in `references/codex-prompts.md`.
+- Command parameter signatures (`/radiology-draft`, `/radiology-intro`, `/radiology-review`, `/radiology-revise`) remain unchanged. Checklist types (STARD, TRIPOD, CLAIM, MI-CLEAR-LLM, TRIPOD-LLM, DEAL, STARD-AI, TRIPOD+AI, CLAIM 2024, CHART) remain unchanged.
