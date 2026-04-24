@@ -11,8 +11,8 @@
 
 <p align="center">
   <a href="https://claude.ai/claude-code"><img src="https://img.shields.io/badge/Claude_Code-Skill-blueviolet?style=flat&logo=anthropic" alt="Claude Code"></a>
-  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex_CLI-GPT--5.4-412991?style=flat&logo=openai&logoColor=white" alt="Codex CLI"></a>
-  <a href="https://github.com/google/gemini-cli"><img src="https://img.shields.io/badge/Gemini_CLI-3.1_Pro-4285F4?style=flat&logo=google&logoColor=white" alt="Gemini CLI"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex_CLI-GPT--5.5-412991?style=flat&logo=openai&logoColor=white" alt="Codex CLI"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Reasoning-xhigh-ff6f00?style=flat" alt="Reasoning xhigh"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT"></a>
 </p>
 
@@ -30,26 +30,30 @@ Common challenges when writing radiology research papers:
 
 ### The Solution
 
-**Multi-Model System**: Each model focuses on its area of expertise
+**3-Model System**: Each role focuses on its area of expertise. Claude Code acts as both the Main Editor and the Style Reviewer (native, no external CLI). GPT-5.5 (via Codex CLI, reasoning: xhigh) handles technical review in one lane and literature analysis in another.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Claude Code (Main Editor)                 │
-│            Drafting · Feedback Integration · Revision        │
+│              Claude Code (Main Editor + Style Reviewer)      │
+│   Drafting · Native Style Review · WebSearch/WebFetch        │
+│            Feedback Integration · Revision                   │
 └─────────────────────────────────────────────────────────────┘
                               │
-       ┌──────────────────────┼──────────────────────┐
-       ▼                      ▼                      ▼
-┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│ GPT-5.4          │  │ Gemini 3.1 Pro   │  │ Gemini 3.1 Pro   │
-│ (reasoning: high)│  │ Style Reviewer   │  │ Lit. Researcher  │
-├──────────────────┤  ├──────────────────┤  ├──────────────────┤
-│ • Study design   │  │ • Sentence flow  │  │ • Lit. review    │
-│ • Statistics     │  │ • Readability    │  │ • Gap analysis   │
-│ • Logical rigor  │  │ • Journal style  │  │ • Citations      │
-│ • Methodology    │  │ • Clarity        │  │ • Background     │
-└──────────────────┘  └──────────────────┘  └──────────────────┘
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+    ┌──────────────────────┐       ┌──────────────────────┐
+    │ GPT-5.5 via Codex    │       │ GPT-5.5 via Codex    │
+    │ Technical Reviewer   │       │ Literature Researcher│
+    │ reasoning: xhigh     │       │ reasoning: xhigh     │
+    ├──────────────────────┤       ├──────────────────────┤
+    │ • Study design       │       │ • Prior work         │
+    │ • Statistics         │       │ • Gap analysis       │
+    │ • Methodology        │       │ • Citation hints     │
+    │ • Checklist compl.   │       │ • Paragraph drafts   │
+    └──────────────────────┘       └──────────────────────┘
 ```
+
+No fourth reviewer exists. All style review is Claude-native; all literature research is Codex (GPT-5.5) Stage 1 followed by Claude WebSearch + WebFetch Stage 2.
 
 ---
 
@@ -57,15 +61,14 @@ Common challenges when writing radiology research papers:
 
 ### Prerequisites
 
-- **Node.js** (v18+) and **npm** — required for Codex CLI and Gemini CLI installation
+- **Node.js** (v18+) and **npm** — required for Codex CLI installation
 
-All three CLI tools must be installed and authenticated:
+Two CLI tools must be installed and authenticated:
 
 | CLI | Install | Authentication |
 |-----|---------|----------------|
 | [Claude Code](https://claude.ai/claude-code) | `curl -fsSL https://claude.ai/install.sh \| bash` (macOS/Linux/WSL) | Subscription (Pro/Max) or API key (`ANTHROPIC_API_KEY`) |
-| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | OAuth login (`codex auth`) or API key (`OPENAI_API_KEY`) |
-| [Gemini CLI](https://github.com/google/gemini-cli) | `npm install -g @google/gemini-cli` | Google OAuth (`gemini auth`) or API key (`GEMINI_API_KEY`) |
+| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | OAuth login (`codex login`) or API key (`OPENAI_API_KEY`) |
 
 > **Note:** Claude Code on Windows: PowerShell `irm https://claude.ai/install.ps1 | iex` / CMD `curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd`. Windows requires [Git for Windows](https://gitforwindows.org/).
 
@@ -109,17 +112,28 @@ claude
 
 - **Title** — Title optimization
 - **Abstract** — Structured abstract (Purpose/Methods/Results/Conclusion)
-- **Introduction** — Background and objectives
+- **Introduction** — Background and objectives (2-stage literature pipeline)
 - **Methods** — Methodology (checklist-based validation)
 - **Results** — Result presentation
 - **Discussion** — Discussion and limitations
 - **Conclusion** — Conclusion
 - **Cover Letter** — Submission cover letter
 
+### Input Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `section_type` | string | Yes | Section to draft or review |
+| `study_type` | string | Yes | Study type (drives checklist selection) |
+| `journal_profile` | string | No | Target journal (Radiology, EurRad, AJR, etc.) |
+| `draft_text` | string | Review/Revise | Text to review |
+| `reviewer_focus` | string | No | balanced \| technical \| clinical_readability \| language_only |
+| `language` | string | No | en (default) \| ko |
+
 ### Key Capabilities
 
-- **Literature Research**: Automated literature review and gap analysis via Gemini 3.1 Pro
-- **Checklist Compliance**: Automatic STARD, TRIPOD, CLAIM verification
+- **Literature Research**: Automated 2-stage pipeline — Codex (GPT-5.5) literature analysis followed by Claude WebSearch + WebFetch URL verification
+- **Checklist Compliance**: Automatic STARD, STARD-AI, TRIPOD, TRIPOD+AI, CLAIM 2024, MI-CLEAR-LLM, TRIPOD-LLM, DEAL, CHART verification where applicable
 - **Number Consistency**: Abstract–Results–Tables number matching
 - **Overclaim Detection**: Flags "first", "novel", "superior" without evidence
 - **Statistical Formatting**: Journal-specific statistical notation validation
@@ -129,12 +143,12 @@ claude
 
 ## Commands
 
-### `/radiology-draft [section]`
+### `/radiology-draft [section] [language]`
 
-Generates a draft for a paper section.
+Generates a draft for a paper section. Claude-only workflow.
 
 ```
-/radiology-draft Methods
+/radiology-draft Methods en
 
 > Study type: diagnostic_accuracy
 > Target journal: Radiology
@@ -144,12 +158,12 @@ Generates a draft for a paper section.
 **Workflow:**
 1. Collect required info (study type, journal, key findings)
 2. Load section template and journal profile
-3. Generate draft
-4. (Optional) Run immediate review
+3. Generate draft (Claude native)
+4. (Optional) Run immediate review via `/radiology-review` (Codex technical + Claude native style)
 
 ### `/radiology-intro [topic]`
 
-Generates a literature-based Introduction section.
+Generates a literature-based Introduction section via a 2-stage pipeline.
 
 ```
 /radiology-intro "Deep learning for liver metastasis detection on CT"
@@ -157,45 +171,52 @@ Generates a literature-based Introduction section.
 > Keywords: liver metastasis, CT, deep learning, diagnostic accuracy
 > Study type: diagnostic_accuracy
 > Target journal: Radiology
+> Language: en
 ```
 
 **Literature Research Workflow:**
 ```
 Research Topic + Keywords
-          │
-          ▼
-┌─────────────────────────┐
-│ Gemini 3.1 Pro          │
-│ Literature Analysis     │
-├─────────────────────────┤
-│ • Clinical context      │
-│ • Key literature        │
-│ • Knowledge gaps        │
-│ • Citation suggestions  │
-└─────────────────────────┘
-          │
-          ▼
-┌─────────────────────────┐
-│ Claude                  │
-│ Introduction Draft      │
-├─────────────────────────┤
-│ P1: Clinical Context    │
-│ P2: Gap/Limitation      │
-│ P3: Objective           │
-└─────────────────────────┘
-          │
-          ▼
-┌─────────────────────────┐
-│ Dual Review (Optional)  │
-├─────────────────────────┤
-│ GPT-5.4: Gap alignment  │
-│ Gemini: Flow, clarity   │
-└─────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────┐
+│ Stage 1 — Codex (GPT-5.5)     │
+│ Literature Analysis           │
+│ reasoning: xhigh              │
+├───────────────────────────────┤
+│ • Prior work (landmark)       │
+│ • Citation hints + queries    │
+│ • Research gap analysis       │
+│ • Paragraph draft suggestions │
+└───────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────┐
+│ Stage 2 — Claude              │
+│ WebSearch + WebFetch          │
+│ URL Verification              │
+├───────────────────────────────┤
+│ • Execute suggested_query     │
+│ • Filter by expected_domains  │
+│ • Verify each candidate URL   │
+│ • Attach verified_url/title   │
+└───────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────┐
+│ Claude — Draft Synthesis      │
+├───────────────────────────────┤
+│ P1: Clinical Context          │
+│ P2: Gap / Limitation          │
+│ P3: Objective                 │
+└───────────────────────────────┘
 ```
+
+On Stage 2 failure (network, rate limit, tool unavailable, all candidates rejected), the command returns Stage 1 results unchanged plus the top-level flag `stage2_verification_failed: true`. The user still gets a usable Introduction draft with citation hints.
 
 ### `/radiology-review [section]`
 
-Reviews existing text with multi-model feedback.
+Reviews existing text with a 3-step sequential pipeline.
 
 ```
 /radiology-review Methods
@@ -203,24 +224,45 @@ Reviews existing text with multi-model feedback.
 [Provide Methods section text]
 ```
 
-**Parallel Review Process:**
+**3-Step Review Process:**
 ```
-GPT-5.4 (reasoning: high)          Gemini 3.1 Pro
-        │                                │
-        ▼                                ▼
-  Technical Issues                 Style Issues
-  - Patient selection bias         - Paragraph organization
-  - Reference standard adequacy    - Verb tense consistency
-  - Statistical rigor              - Readability score
-        │                                │
-        └────────────┬───────────────────┘
-                     ▼
-            Unified Feedback JSON
+┌───────────────────────────────┐
+│ Step 1 — Codex (GPT-5.5)      │
+│ Technical Review              │
+│ reasoning: xhigh              │
+├───────────────────────────────┤
+│ • Patient selection bias      │
+│ • Reference standard adequacy │
+│ • Statistical rigor           │
+│ • Checklist compliance        │
+│   (source: "gpt-5.5")         │
+└───────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────┐
+│ Step 2 — Claude Native        │
+│ Style Review                  │
+├───────────────────────────────┤
+│ • Sentence flow / brevity     │
+│ • Paragraph organization      │
+│ • Verb tense consistency      │
+│ • Terminology consistency     │
+│ • Candidate rewrites          │
+│   (source: "claude")          │
+└───────────────────────────────┘
+           │
+           ▼
+┌───────────────────────────────┐
+│ Step 3 — Unified JSON Merge   │
+│ Per-item source preserved     │
+└───────────────────────────────┘
 ```
+
+Claude loads the **Style Guidance for Claude Native Review** header from `references/codex-prompts.md` and applies it directly to the draft. No external CLI is invoked for Step 2.
 
 ### `/radiology-revise`
 
-Revises draft based on review feedback.
+Revises draft based on review feedback. Claude-only workflow.
 
 **Priority Order:**
 1. Critical methodology issues
@@ -228,11 +270,13 @@ Revises draft based on review feedback.
 3. Clarity/style improvements
 4. Minor polish
 
+Optional: Re-run targeted `/radiology-review` on changed sections.
+
 ---
 
 ## Output Format
 
-Review results are provided as structured JSON and automatically saved to `output/{section}_{timestamp}/` in both JSON and Markdown formats (see [Output Files](#output-files)):
+Review results are provided as structured JSON and automatically saved to `output/{section}_{timestamp}/` in both JSON and Markdown formats (see [Output Files](#output-files)). All JSON keys are preserved verbatim for backward compatibility. Allowed `source` values at item level are `"claude"` and `"gpt-5.5"`.
 
 ```json
 {
@@ -242,15 +286,32 @@ Review results are provided as structured JSON and automatically saved to `outpu
       "location": "Patient Selection, paragraph 2",
       "description": "Eligibility criteria not explicitly stated",
       "severity": "critical",
-      "source": "gpt-5.4"
+      "source": "gpt-5.5"
     }
   ],
   "clarity_issues": [
     {
       "type": "readability",
       "location": "Statistical Analysis, sentence 3",
+      "description": "Long compound sentence reduces clarity",
       "suggestion": "Break into two sentences for clarity",
-      "source": "gemini"
+      "source": "claude"
+    }
+  ],
+  "terminology_and_consistency": [
+    {
+      "term": "deep learning vs DL",
+      "locations": ["Introduction paragraph 1", "Methods paragraph 4"],
+      "canonical_form": "deep learning (DL) on first use; DL thereafter",
+      "source": "claude"
+    }
+  ],
+  "candidate_rewrites": [
+    {
+      "location": "Methods, paragraph 2",
+      "original": "The patients were selected...",
+      "revised": "Consecutive patients who met eligibility criteria...",
+      "rationale": "Specifies sampling method and makes subject explicit"
     }
   ],
   "checklist": {
@@ -272,33 +333,40 @@ Review results are automatically saved to the `output/` directory in both JSON a
 
 ```
 output/
-├── methods_20260308_143022/
-│   ├── review_result.json       # Structured JSON review result
-│   ├── review_report.md         # Human-readable Markdown report
-│   ├── codex_raw.json           # Raw GPT-5.4 response (on success)
-│   └── gemini_raw.json          # Raw Gemini response (on success)
-├── abstract_20260309_091500/
+├── methods_20260423_143022/
+│   ├── review_result.json         # Unified structured JSON review result
+│   ├── review_report.md           # Human-readable Markdown report
+│   ├── codex_raw.json             # Raw GPT-5.5 response (on success)
+│   └── claude_style_raw.json      # Raw Claude native style review output
+├── introduction_20260423_150145/
 │   ├── review_result.json
 │   ├── review_report.md
-│   └── ...
+│   ├── codex_raw.json
+│   ├── claude_style_raw.json
+│   └── stage2_verification.json   # (introduction only) per-hint URL verification status
+└── abstract_20260424_091500/
+    ├── review_result.json
+    ├── review_report.md
+    └── ...
 ```
 
 ### File Descriptions
 
 | File | Format | Description |
 |------|--------|-------------|
-| `review_result.json` | JSON | Unified review result (major_issues, clarity_issues, checklist, etc.) |
+| `review_result.json` | JSON | Unified review result (`major_issues`, `clarity_issues`, `terminology_and_consistency`, `candidate_rewrites`, `checklist`) |
 | `review_report.md` | Markdown | Report with header, issue summary, rewrite suggestions, checklist status |
-| `codex_raw.json` | JSON | Raw GPT-5.4 response (for traceability and debugging) |
-| `gemini_raw.json` | JSON | Raw Gemini response (for traceability and debugging) |
+| `codex_raw.json` | JSON | Raw GPT-5.5 response (for traceability and debugging) |
+| `claude_style_raw.json` | JSON | Raw Claude native style review output |
+| `stage2_verification.json` | JSON | Introduction only: per-citation-hint URL verification status, or `stage2_verification_failed: true` at top level when verification could not complete |
 
 ### review_report.md Structure
 
 1. **Header** — Section type, study type, target journal, review date
-2. **Major Issues** — Sorted by severity (critical > major > minor), source attribution
-3. **Clarity Issues** — Readability/structure/flow issues with suggestions
-4. **Terminology & Consistency** — Terminology and consistency issues
-5. **Candidate Rewrites** — Original vs revised text comparison (with rationale)
+2. **Major Issues** — Sorted by severity (critical > major > minor), source attribution (`claude` or `gpt-5.5`)
+3. **Clarity Issues** — Readability/structure/flow issues with suggestions (source: `claude`)
+4. **Terminology & Consistency** — Terminology and consistency issues (source: `claude`)
+5. **Candidate Rewrites** — Original vs revised text comparison with rationale
 6. **Checklist Compliance** — Compliant/missing/incomplete items with compliance rate
 7. **Summary Statistics** — Issue count by severity, checklist compliance rate (%)
 
@@ -307,7 +375,7 @@ output/
 - All outputs are created under `output/` in the project root
 - Each review session creates a new timestamped directory
 - Previous results are never overwritten
-- Directory naming: `{section}_{YYYYMMDD_HHMMSS}` (e.g., `methods_20260308_143022`)
+- Directory naming: `{section}_{YYYYMMDD_HHMMSS}` (e.g., `methods_20260423_143022`)
 
 ---
 
@@ -315,7 +383,7 @@ output/
 
 ### Methods Section Example
 
-| GPT-5.4 (Technical) | Gemini (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -331,33 +399,37 @@ output/
 
 ### Model Configuration
 
-| Model | CLI | Parameters | Purpose |
-|-------|-----|------------|---------|
-| GPT-5.4 | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Technical Review |
-| Gemini 3.1 Pro | Gemini | `--approval-mode yolo` (auto-approve) | Style Review |
-| Gemini 3.1 Pro | Gemini | `-m gemini-3.1-pro-preview --approval-mode yolo` | Literature Research |
+| Role | CLI / Invocation | Parameters | Purpose |
+|------|------------------|------------|---------|
+| Claude Code (Main Editor + Style Reviewer) | Native (no external CLI) | Loads "Style Guidance for Claude Native Review" from `references/codex-prompts.md`; uses WebSearch + WebFetch for Stage 2 URL verification | Drafting, revision, style review, citation verification |
+| GPT-5.5 (Technical Reviewer) | Codex CLI | `-m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh` | Technical/methodological review |
+| GPT-5.5 (Literature Researcher) | Codex CLI | `-m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh` | `/radiology-intro` Stage 1 literature analysis |
 
 ### Execution Commands
 
 ```bash
-# GPT-5.4 Technical Review
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+# Technical or methodological review (read-only sandbox, xhigh reasoning)
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[prompt]"
 
-# Gemini Style Review
-gemini --approval-mode yolo "[prompt]"
+# Literature analysis for Introduction (Stage 1 of /radiology-intro)
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[literature prompt]"
 
-# Gemini 3.1 Pro Literature Research
-gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
+# Follow-up in the same Codex session
+codex exec resume --last "[follow-up prompt]"
 ```
+
+Claude native operations — style review, URL verification (WebSearch + WebFetch), draft generation, revision, feedback integration — invoke no external CLI.
 
 ### Error Handling
 
 | Scenario | Action |
 |----------|--------|
-| GPT-5.4 timeout/failure | Retry once, then Claude-only review |
-| Gemini error | Continue with GPT-5.4 review only |
-| Both CLI failures | Claude provides basic review |
-| Invalid JSON response | Extract text feedback, present as unstructured |
+| Codex invocation failure (timeout, exit nonzero, empty response, invalid JSON) | Fallback to Claude-only review with explicit notice in the JSON (`"fallback": "claude_only"`, `"codex_error": "<message>"`). All unified JSON keys are preserved; `major_issues` is populated by Claude with `source: "claude"`. Retry once before falling back. |
+| Claude native style review produces invalid JSON | Retry internal synthesis once; on repeat failure, present text feedback verbatim in `review_report.md` and set `clarity_issues: []` in JSON. |
+| Stage 2 URL verification failure (WebSearch or WebFetch) | Return Stage 1 results unchanged plus `stage2_verification_failed: true`. Do not error out. |
+| Empty input draft | Prompt user for the draft before running any reviewer. |
+
+No fallback path uses any non-Claude, non-Codex model. The system operates strictly on 3 model roles: Claude Code (Main Editor + Style Reviewer), Codex GPT-5.5 Technical Reviewer, Codex GPT-5.5 Literature Researcher.
 
 ---
 
@@ -368,11 +440,12 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 - Checklists in English
 
 ### Korean (`language="ko"`)
-- GPT-5.4 prompts: English (technical consistency)
-- Gemini prompts: Korean style guidelines added
-- Output feedback: Korean
+- Codex (GPT-5.5) prompts: kept in English for technical consistency
+- Claude native style review: applies the Korean-to-English Guidelines section from `references/codex-prompts.md` (Style Guidance for Claude Native Review)
+- Output feedback: presented in Korean when requested
+- Checklists: item names in English, descriptions bilingual
 - Korean-specific rules:
-  - Consistent honorific style
+  - Consistent honorific style (존댓말 일관성)
   - English medical terms vs Korean terms selection
   - Sentence length: under 40 characters recommended
 
@@ -394,24 +467,30 @@ gemini -m gemini-3.1-pro-preview --approval-mode yolo "[research prompt]"
 
 ```
 ~/.claude/skills/radiology-paper-writer/
-├── SKILL.md                          # Main skill definition
+├── SKILL.md                          # Main skill definition (3-model pipeline)
 ├── README.md                         # English documentation
 ├── README.ko.md                      # Korean documentation
-├── IMPLEMENTATION_PLAN.md            # Development roadmap
+├── IMPLEMENTATION_PLAN.md            # Development roadmap and migration history
 ├── references/
-│   ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM checklists
+│   ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM, MI-CLEAR-LLM,
+│   │                                 # TRIPOD-LLM, DEAL, CHART checklists
 │   ├── section-templates.md          # Section-specific templates
-│   ├── journal-profiles.md           # Journal requirements
-│   ├── codex-prompts.md              # GPT-5.4 review prompts
-│   └── gemini-prompts.md             # Gemini review prompts
+│   ├── journal-profiles.md           # Journal requirements and formatting
+│   └── codex-prompts.md              # GPT-5.5 review prompts +
+│                                     # Style Guidance for Claude Native Review +
+│                                     # Introduction Literature Analysis prompt
 └── output/                           # Auto-generated review outputs
-    ├── methods_20260308_143022/
+    ├── methods_20260423_143022/
     │   ├── review_result.json
     │   ├── review_report.md
     │   ├── codex_raw.json
-    │   └── gemini_raw.json
-    └── abstract_20260309_091500/
-        └── ...
+    │   └── claude_style_raw.json
+    └── introduction_20260423_150145/
+        ├── review_result.json
+        ├── review_report.md
+        ├── codex_raw.json
+        ├── claude_style_raw.json
+        └── stage2_verification.json
 ```
 
 ---
@@ -446,3 +525,4 @@ MIT License
 - MI-CLEAR-LLM (Medical Imaging Checklist for LLM Evaluation and Reporting)
 - TRIPOD-LLM (Transparent Reporting of LLM Prediction Models)
 - DEAL (Developing and Evaluating LLMs)
+- CHART (Chatbot Assessment Reporting Tool)
