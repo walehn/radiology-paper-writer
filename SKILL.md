@@ -1,6 +1,6 @@
 ---
 name: radiology-paper-writer
-description: AI-assisted radiology research paper writing with multi-model review. Claude drafts and reviews style natively, GPT-5.4 (reasoning: high) reviews methodology, GPT-5.4 (reasoning: high) performs literature analysis, and Claude WebSearch/WebFetch verifies citations. Supports STARD/TRIPOD/CLAIM/MI-CLEAR-LLM checklists. Triggers on /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands.
+description: AI-assisted radiology research paper writing with multi-model review. Claude drafts and reviews style natively, GPT-5.5 (reasoning: xhigh) reviews methodology, GPT-5.5 (reasoning: xhigh) performs literature analysis, and Claude WebSearch/WebFetch verifies citations. Supports STARD/TRIPOD/CLAIM/MI-CLEAR-LLM checklists. Triggers on /radiology-draft, /radiology-intro, /radiology-review, /radiology-revise commands.
 ---
 
 # Radiology Paper Writer
@@ -12,10 +12,10 @@ description: AI-assisted radiology research paper writing with multi-model revie
 | Role | When Invoked | Invocation Method |
 |------|--------------|-------------------|
 | **Claude Code (Main Editor + Style Reviewer)** | 모든 초안 작성, 수정, 버전 관리, /radiology-review Step 2 (스타일 리뷰), /radiology-intro Stage 2 (URL 검증) | Native (no external CLI). Style criteria loaded from `references/codex-prompts.md` "Style Guidance for Claude Native Review" header. URL verification via Claude WebSearch + WebFetch tools. |
-| **Codex (GPT-5.4) Technical Reviewer** | /radiology-review Step 1, /radiology-draft optional dual review (technical side), /radiology-intro optional dual review (technical side) | `codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"` with prompts from `references/codex-prompts.md`. |
-| **Codex (GPT-5.4) Literature Researcher** | /radiology-intro Stage 1 (Introduction literature analysis) | `codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"` using the "Introduction Literature Analysis" prompt in `references/codex-prompts.md`. |
+| **Codex (GPT-5.5) Technical Reviewer** | /radiology-review Step 1, /radiology-draft optional dual review (technical side), /radiology-intro optional dual review (technical side) | `codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[prompt]"` with prompts from `references/codex-prompts.md`. |
+| **Codex (GPT-5.5) Literature Researcher** | /radiology-intro Stage 1 (Introduction literature analysis) | `codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[prompt]"` using the "Introduction Literature Analysis" prompt in `references/codex-prompts.md`. |
 
-No fourth reviewer exists. All style review is Claude-native; all literature research is Codex (GPT-5.4) Stage 1 followed by Claude WebSearch + WebFetch Stage 2.
+No fourth reviewer exists. All style review is Claude-native; all literature research is Codex (GPT-5.5) Stage 1 followed by Claude WebSearch + WebFetch Stage 2.
 
 ## Supported Study Types
 
@@ -66,7 +66,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 
 4. **Save Output** - Save draft and review results to `output/{section}_{timestamp}/`
    - Save `review_result.json` and `review_report.md` (if dual review was executed)
-   - Save `codex_raw.json` (raw GPT-5.4 response, if available)
+   - Save `codex_raw.json` (raw GPT-5.5 response, if available)
 
 **Example:**
 
@@ -91,10 +91,10 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
    - Target journal
    - Language (en/ko)
 
-2. **Stage 1 — Codex Literature Analysis** (GPT-5.4, reasoning: high)
+2. **Stage 1 — Codex Literature Analysis** (GPT-5.5, reasoning: xhigh)
 
    ```bash
-   codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high \
+   codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh \
      "[Introduction Literature Analysis prompt from references/codex-prompts.md]"
    ```
 
@@ -103,7 +103,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
    - `citation_hints`: each with `suggested_query`, `expected_domains`, `rationale`
    - `research_gap_analysis`: `specific_gaps`, `how_study_addresses_gap`, `novelty`, `expected_contribution`, `clinical_translation`
    - `suggested_introduction_structure`: paragraph-level drafts
-   - `source: "gpt-5.4"`
+   - `source: "gpt-5.5"`
 
 3. **Stage 2 — Claude URL Verification** (Claude WebSearch + WebFetch)
 
@@ -124,7 +124,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
    - Integrate verified citations where available; fall back to citation hints (unverified) when Stage 2 failed.
 
 5. **Optional Dual Review** - Ask user if they want immediate review
-   - Codex (GPT-5.4): Clinical relevance, gap clarity, objective alignment
+   - Codex (GPT-5.5): Clinical relevance, gap clarity, objective alignment
    - Claude native: Flow, readability, citation integration
 
 6. **Save Output** - Save results to `output/introduction_{timestamp}/`
@@ -142,7 +142,7 @@ Title | Abstract | Introduction | Methods | Results | Discussion | Conclusion | 
 > Target journal: Radiology
 > Language: en
 
-Stage 1 (Codex GPT-5.4, reasoning: high): Literature analysis, gap identification, citation hints
+Stage 1 (Codex GPT-5.5, reasoning: xhigh): Literature analysis, gap identification, citation hints
 Stage 2 (Claude WebSearch + WebFetch): URL verification against suggested queries and expected domains
 Draft synthesis (Claude): 3-paragraph Introduction with verified citations
 ```
@@ -161,14 +161,14 @@ Draft synthesis (Claude): 3-paragraph Introduction with verified citations
    - segmentation_ai → CLAIM 2024
    - llm_study → MI-CLEAR-LLM + TRIPOD-LLM + DEAL
 
-3. **Step 1 — Codex Technical Review** (GPT-5.4, reasoning: high)
+3. **Step 1 — Codex Technical Review** (GPT-5.5, reasoning: xhigh)
 
    ```bash
-   codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high \
+   codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh \
      "[technical prompt from references/codex-prompts.md]"
    ```
 
-   Emits technical `major_issues` with `source: "gpt-5.4"` and checklist compliance.
+   Emits technical `major_issues` with `source: "gpt-5.5"` and checklist compliance.
 
 4. **Step 2 — Claude Native Style Review**
 
@@ -178,12 +178,12 @@ Draft synthesis (Claude): 3-paragraph Introduction with verified citations
 
 5. **Step 3 — Unified JSON Merge**
 
-   Claude merges Step 1 and Step 2 outputs into the unified JSON schema (see Output Structure below). The `source` field on each issue is preserved per-item; no combined values such as `"claude+gpt-5.4"` are produced (OQ-2 default).
+   Claude merges Step 1 and Step 2 outputs into the unified JSON schema (see Output Structure below). The `source` field on each issue is preserved per-item; no combined values such as `"claude+gpt-5.5"` are produced (OQ-2 default).
 
 6. **Save Output** - Save all results to `output/{section}_{timestamp}/`
    - Save `review_result.json` (unified structured output)
    - Generate and save `review_report.md` (human-readable Markdown report)
-   - Save `codex_raw.json` (raw GPT-5.4 response, if available)
+   - Save `codex_raw.json` (raw GPT-5.5 response, if available)
    - Save `claude_style_raw.json` (raw Claude native style review output)
 
 **Example:**
@@ -193,7 +193,7 @@ Draft synthesis (Claude): 3-paragraph Introduction with verified citations
 
 [User provides or Claude reads the Methods section text]
 
-Step 1: Codex GPT-5.4 (reasoning: high) — methodological rigor, statistics, bias, checklist compliance
+Step 1: Codex GPT-5.5 (reasoning: xhigh) — methodological rigor, statistics, bias, checklist compliance
 Step 2: Claude native — clarity, structure, readability, terminology consistency, candidate rewrites
 Step 3: Unified JSON merge and review_report.md generation
 ```
@@ -220,7 +220,7 @@ Step 3: Unified JSON merge and review_report.md generation
 
 ### Abstract
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Structure: 목적-방법-결과-결론 | Sentence brevity (< 25 words) |
 | Number consistency with Results | Information density |
@@ -230,7 +230,7 @@ Step 3: Unified JSON merge and review_report.md generation
 
 ### Introduction
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Clinical relevance established | General → Specific flow |
 | Literature balance (not cherry-picked) | Paragraph unity |
@@ -241,7 +241,7 @@ Step 3: Unified JSON merge and review_report.md generation
 
 ### Methods
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -253,7 +253,7 @@ Step 3: Unified JSON merge and review_report.md generation
 
 ### Results
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Table/figure vs text consistency | One message per paragraph |
 | Primary outcome prominence | Key message first |
@@ -262,7 +262,7 @@ Step 3: Unified JSON merge and review_report.md generation
 
 ### Discussion
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Interpretation validity | Logical flow |
 | Novelty vs literature context | Transition sentences |
@@ -282,7 +282,7 @@ output/
 ├── {section}_{timestamp}/
 │   ├── review_result.json         # Structured JSON output
 │   ├── review_report.md           # Human-readable Markdown report
-│   ├── codex_raw.json             # Raw GPT-5.4 response (if available)
+│   ├── codex_raw.json             # Raw GPT-5.5 response (if available)
 │   ├── claude_style_raw.json      # Raw Claude native style review output
 │   └── stage2_verification.json   # (introduction only) per-citation-hint URL verification status
 ```
@@ -299,7 +299,7 @@ Contains the unified structured JSON output (see Output Structure below).
 A human-readable Markdown report with the following sections:
 
 1. **Header** - Section type, study type, target journal, review date
-2. **Major Issues** - From `major_issues`, sorted by severity (critical > major > minor), with source attribution (`claude` or `gpt-5.4`)
+2. **Major Issues** - From `major_issues`, sorted by severity (critical > major > minor), with source attribution (`claude` or `gpt-5.5`)
 3. **Clarity Issues** - From `clarity_issues`, with suggestions (source: `claude`)
 4. **Terminology & Consistency** - From `terminology_and_consistency` (source: `claude`)
 5. **Candidate Rewrites** - Original vs revised text with rationale (diff-style presentation)
@@ -308,7 +308,7 @@ A human-readable Markdown report with the following sections:
 
 ### Raw Response Files
 
-- `codex_raw.json` - Raw GPT-5.4 response preserved for traceability (saved only when GPT-5.4 review succeeds)
+- `codex_raw.json` - Raw GPT-5.5 response preserved for traceability (saved only when GPT-5.5 review succeeds)
 - `claude_style_raw.json` - Raw output of Claude native style review
 - `stage2_verification.json` - (introduction only) list of citation hints with verified URLs, titles, and timestamps, or `stage2_verification_failed: true` at top level when verification could not complete
 
@@ -323,7 +323,7 @@ A human-readable Markdown report with the following sections:
 
 ## Output Structure
 
-Review results are presented in this unified format and saved to `review_result.json`. **All JSON keys are preserved verbatim from the previous version** (backward-compatible for downstream consumers). Only the `source` field value set changes: allowed values are `"claude"` and `"gpt-5.4"`.
+Review results are presented in this unified format and saved to `review_result.json`. **All JSON keys are preserved verbatim from the previous version** (backward-compatible for downstream consumers). Only the `source` field value set changes: allowed values are `"claude"` and `"gpt-5.5"`.
 
 ```json
 {
@@ -333,7 +333,7 @@ Review results are presented in this unified format and saved to `review_result.
       "location": "paragraph/sentence reference",
       "description": "issue description",
       "severity": "critical|major|minor",
-      "source": "gpt-5.4"
+      "source": "gpt-5.5"
     }
   ],
   "clarity_issues": [
@@ -370,20 +370,20 @@ Review results are presented in this unified format and saved to `review_result.
 }
 ```
 
-Allowed `source` values at item level: `"claude"`, `"gpt-5.4"`. No combined values; each module emits a single source per item (OQ-2).
+Allowed `source` values at item level: `"claude"`, `"gpt-5.5"`. No combined values; each module emits a single source per item (OQ-2).
 
 ---
 
 ## CLI Command Reference
 
-### GPT-5.4 Execution (via Codex CLI)
+### GPT-5.5 Execution (via Codex CLI)
 
 ```bash
 # Technical or methodological review (read-only sandbox, high reasoning)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[prompt]"
 
 # Literature analysis for Introduction (Stage 1 of /radiology-intro)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[literature prompt]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[literature prompt]"
 
 # Follow-up in same session
 codex exec resume --last "[follow-up prompt]"
@@ -406,7 +406,7 @@ codex exec resume --last "[follow-up prompt]"
 | Stage 2 URL verification failure (WebSearch or WebFetch) | Return Stage 1 results unchanged plus `stage2_verification_failed: true`. Do NOT error out (OQ-1). |
 | Empty input draft | Prompt user for the draft before running any reviewer. |
 
-**No fallback path uses any non-Claude, non-Codex model.** The system operates strictly on 3 models: Claude Code (Main Editor + Style Reviewer), Codex GPT-5.4 Technical Reviewer, Codex GPT-5.4 Literature Researcher.
+**No fallback path uses any non-Claude, non-Codex model.** The system operates strictly on 3 models: Claude Code (Main Editor + Style Reviewer), Codex GPT-5.5 Technical Reviewer, Codex GPT-5.5 Literature Researcher.
 
 ---
 
@@ -420,7 +420,7 @@ codex exec resume --last "[follow-up prompt]"
 
 ### Korean (language="ko")
 
-- Codex (GPT-5.4) prompts: Keep English (technical consistency)
+- Codex (GPT-5.5) prompts: Keep English (technical consistency)
 - Claude native style review: Apply Korean-to-English Guidelines section from `references/codex-prompts.md` "Style Guidance for Claude Native Review"
 - Output feedback: Present in Korean when requested
 - Checklists: Item names in English, descriptions bilingual
@@ -449,16 +449,16 @@ Korean-specific style rules:
 - `references/radiology-checklists.md` - STARD, TRIPOD, CLAIM, MI-CLEAR-LLM, TRIPOD-LLM, DEAL, CHART checklists
 - `references/section-templates.md` - Section-specific review criteria details
 - `references/journal-profiles.md` - Journal requirements and formatting
-- `references/codex-prompts.md` - GPT-5.4 review prompts by section, Introduction Literature Analysis prompt, and Style Guidance for Claude Native Review
+- `references/codex-prompts.md` - GPT-5.5 review prompts by section, Introduction Literature Analysis prompt, and Style Guidance for Claude Native Review
 
 ---
 
 ## Migration Notes
 
-This skill transitioned to the current 3-model pipeline (Claude Main Editor + Style Reviewer, Codex GPT-5.4 Technical Reviewer, Codex GPT-5.4 Literature Researcher) on 2026-04-23. Historical details about the prior architecture are recorded only in `IMPLEMENTATION_PLAN.md`. Key guarantees of this transition:
+This skill transitioned to the current 3-model pipeline (Claude Main Editor + Style Reviewer, Codex GPT-5.5 Technical Reviewer, Codex GPT-5.5 Literature Researcher) on 2026-04-23. Historical details about the prior architecture are recorded only in `IMPLEMENTATION_PLAN.md`. Key guarantees of this transition:
 
 - Style review is now Claude-native. Criteria live in `references/codex-prompts.md` under the "Style Guidance for Claude Native Review" header (medical writing criteria, Korean-to-English guidelines, passive voice handling, terminology consistency).
-- Literature research is now performed by Codex GPT-5.4 with `model_reasoning_effort=high` using the "Introduction Literature Analysis" prompt in `references/codex-prompts.md`.
+- Literature research is now performed by Codex GPT-5.5 with `model_reasoning_effort=xhigh` using the "Introduction Literature Analysis" prompt in `references/codex-prompts.md`.
 - `/radiology-intro` now has a Stage 2 in which Claude uses WebSearch and WebFetch to verify citation URLs produced by Stage 1. On Stage 2 failure, Stage 1 results are returned with `stage2_verification_failed: true`.
-- Output JSON schema keys are unchanged (`major_issues`, `clarity_issues`, `terminology_and_consistency`, `candidate_rewrites`, `checklist`). The `source` field takes `"claude"` or `"gpt-5.4"` only; no other values are emitted.
+- Output JSON schema keys are unchanged (`major_issues`, `clarity_issues`, `terminology_and_consistency`, `candidate_rewrites`, `checklist`). The `source` field takes `"claude"` or `"gpt-5.5"` only; no other values are emitted.
 - Command parameter signatures (`/radiology-draft`, `/radiology-intro`, `/radiology-review`, `/radiology-revise`) are unchanged.

@@ -30,8 +30,8 @@
                  ┌───────────────┴────────────────┐
                  ▼                                ▼
      ┌────────────────────────┐      ┌────────────────────────┐
-     │ Codex GPT-5.4          │      │ Codex GPT-5.4          │
-     │ (reasoning: high)      │      │ (reasoning: high)      │
+     │ Codex GPT-5.5          │      │ Codex GPT-5.5          │
+     │ (reasoning: xhigh)      │      │ (reasoning: xhigh)      │
      │ Technical Reviewer     │      │ Literature Researcher  │
      ├────────────────────────┤      ├────────────────────────┤
      │ • Study design         │      │ • Prior work synthesis │
@@ -71,7 +71,7 @@ Only three roles exist. Style review runs inside Claude; literature research run
 
 ### Key Capabilities
 
-- **Literature Research**: Codex GPT-5.4 (reasoning: high) 기반 구조화된 문헌 분석 + Claude WebSearch/WebFetch URL 검증
+- **Literature Research**: Codex GPT-5.5 (reasoning: xhigh) 기반 구조화된 문헌 분석 + Claude WebSearch/WebFetch URL 검증
 - **Checklist Compliance**: STARD, TRIPOD, CLAIM, MI-CLEAR-LLM 자동 검증
 - **Number Consistency**: Abstract-Results-Tables 수치 일치 확인
 - **Overclaim Detection**: "first", "novel", "superior" 등 과장 표현 감지
@@ -119,9 +119,9 @@ Research Topic + Keywords
           │
           ▼
 ┌─────────────────────────────┐
-│ Stage 1 — Codex GPT-5.4     │
+│ Stage 1 — Codex GPT-5.5     │
 │ Literature Analysis         │
-│ (reasoning: high)           │
+│ (reasoning: xhigh)           │
 ├─────────────────────────────┤
 │ • prior_work                │
 │ • citation_hints            │
@@ -159,7 +159,7 @@ Research Topic + Keywords
 ┌─────────────────────────────┐
 │ Dual Review (Optional)      │
 ├─────────────────────────────┤
-│ Codex GPT-5.4: Gap align.   │
+│ Codex GPT-5.5: Gap align.   │
 │ Claude native: Flow, clarity│
 └─────────────────────────────┘
 ```
@@ -177,8 +177,8 @@ Research Topic + Keywords
 **Sequential Review Process:**
 
 ```
-Step 1: Codex GPT-5.4 Technical
-         (reasoning: high)
+Step 1: Codex GPT-5.5 Technical
+         (reasoning: xhigh)
           │
           ▼
   • Patient selection bias
@@ -216,7 +216,7 @@ Step 3: Unified JSON Merge
 
 ## Output Format
 
-리뷰 결과는 구조화된 JSON으로 제공됩니다. JSON 키는 이전 버전과 완전 호환되며 `source` 필드 값만 `"claude"` 또는 `"gpt-5.4"`로 정정되었습니다.
+리뷰 결과는 구조화된 JSON으로 제공됩니다. JSON 키는 이전 버전과 완전 호환되며 `source` 필드 값만 `"claude"` 또는 `"gpt-5.5"`로 정정되었습니다.
 
 ```json
 {
@@ -226,7 +226,7 @@ Step 3: Unified JSON Merge
       "location": "Patient Selection, paragraph 2",
       "description": "Eligibility criteria not explicitly stated",
       "severity": "critical",
-      "source": "gpt-5.4"
+      "source": "gpt-5.5"
     }
   ],
   "clarity_issues": [
@@ -268,7 +268,7 @@ Step 3: Unified JSON Merge
 
 ### Methods Section Example
 
-| GPT-5.4 (Technical) | Claude (Style) |
+| GPT-5.5 (Technical) | Claude (Style) |
 |---------------------|----------------|
 | Patient selection bias | Paragraph organization |
 | Spectrum bias | Subsection structure |
@@ -285,7 +285,7 @@ Step 3: Unified JSON Merge
 ### Prerequisites
 
 - [Claude Code](https://claude.ai/claude-code) CLI 설치
-- [Codex CLI](https://github.com/openai/codex) 설치 및 OpenAI API 키 설정 (GPT-5.4 접근 필요)
+- [Codex CLI](https://github.com/openai/codex) 설치 및 OpenAI API 키 설정 (GPT-5.5 접근 필요)
 
 No other external CLI is required. Claude's native tools (WebSearch, WebFetch) handle URL verification.
 
@@ -317,17 +317,17 @@ claude-code
 | Role | CLI | Parameters | Purpose |
 |------|-----|------------|---------|
 | Claude Code | (native, no CLI) | — | Drafting, style review, URL verification, revision |
-| Codex GPT-5.4 Technical | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Methodological review |
-| Codex GPT-5.4 Literature | Codex | `--sandbox read-only --config model_reasoning_effort=high` | Introduction literature analysis (Stage 1) |
+| Codex GPT-5.5 Technical | Codex | `--sandbox read-only --config model_reasoning_effort=xhigh` | Methodological review |
+| Codex GPT-5.5 Literature | Codex | `--sandbox read-only --config model_reasoning_effort=xhigh` | Introduction literature analysis (Stage 1) |
 
 ### Execution Commands
 
 ```bash
-# Technical review (GPT-5.4, high reasoning)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[prompt]"
+# Technical review (GPT-5.5, high reasoning)
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[prompt]"
 
-# Literature analysis (GPT-5.4, high reasoning, Stage 1 of /radiology-intro)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[literature prompt]"
+# Literature analysis (GPT-5.5, high reasoning, Stage 1 of /radiology-intro)
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[literature prompt]"
 ```
 
 Claude native operations (style review, URL verification, draft generation, revision) do not shell out.
@@ -383,7 +383,7 @@ Claude native operations (style review, URL verification, draft generation, revi
     ├── radiology-checklists.md       # STARD, TRIPOD, CLAIM, MI-CLEAR-LLM checklists
     ├── section-templates.md          # Section-specific templates
     ├── journal-profiles.md           # Journal requirements
-    └── codex-prompts.md              # GPT-5.4 review prompts + Introduction Literature Analysis + Style Guidance for Claude Native Review
+    └── codex-prompts.md              # GPT-5.5 review prompts + Introduction Literature Analysis + Style Guidance for Claude Native Review
 ```
 
 ---

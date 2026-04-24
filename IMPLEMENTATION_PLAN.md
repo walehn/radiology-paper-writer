@@ -258,6 +258,32 @@ gemini --approval-mode yolo "[prompt with draft]"
 
 ## Changelog
 
+### 2026-04-24 — Model upgrade: GPT-5.4 → GPT-5.5, reasoning=xhigh
+
+Upgraded the Codex reviewer/researcher model from `gpt-5.4` to `gpt-5.5` and bumped the `model_reasoning_effort` configuration from `high` to `xhigh` across SKILL.md, README.md, `references/codex-prompts.md`, and `references/section-templates.md`.
+
+**Why:**
+
+- OpenAI Codex CLI 0.124.0 now supports `gpt-5.5` as the current model (see `~/.codex/config.toml` `[notice.model_migrations]` chain: `gpt-5-codex → gpt-5.2-codex → gpt-5.3-codex → gpt-5.4 → gpt-5.5`).
+- The `model_reasoning_effort` enum gained an `xhigh` level beyond `high`, suited for clinically high-stakes methodology review and literature gap analysis.
+
+**What changed (active docs):**
+
+- Model name: `gpt-5.4` → `gpt-5.5` (and `GPT-5.4` → `GPT-5.5`) everywhere in SKILL.md, README.md, `references/codex-prompts.md`, `references/section-templates.md`.
+- Reasoning effort: `model_reasoning_effort=high` → `model_reasoning_effort=xhigh` in all `codex exec` invocations.
+- JSON schema `source` field allowed values transition from `{"claude", "gpt-5.4"}` to `{"claude", "gpt-5.5"}`.
+
+**Scope:**
+
+- Not a SPEC-level change. SPEC-RAD-REFACTOR-001 explicitly listed Codex version upgrade as a Non-Goal; this change is a routine version-track follow-up rather than a refactor.
+- Prior `gpt-5.4` references are preserved only in this changelog section for historical traceability.
+- Output artifacts already saved under `output/` or `.moai/specs/SPEC-RAD-REFACTOR-001/test-samples/s1_output_methods_*` that list `"source": "gpt-5.5"` remain valid; downstream parsers must accept the new enum.
+
+**Verification:**
+
+- `codex exec -m gpt-5.5 --config model_reasoning_effort=xhigh` accepted by codex-cli 0.124.0 (verified: `reasoning effort: xhigh` appears in the Codex session header; `reasoning_effort` enum `{none, minimal, low, medium, high, xhigh}`).
+- Post-change grep: zero `gpt-5.4` / `GPT-5.4` / `reasoning_effort=high` / `reasoning: high` matches in active docs (this changelog section excluded).
+
 ### 2026-04-23 — Refactor: 4-model → 3-model architecture
 
 Refactor — Removed Gemini CLI dependency, migrated style review to Claude native, migrated literature research to Codex GPT-5.4 Stage 1 + Claude WebSearch Stage 2.

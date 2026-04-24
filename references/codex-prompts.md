@@ -1,15 +1,15 @@
-# Codex (GPT-5.4) Review Prompts
+# Codex (GPT-5.5) Review Prompts
 
-Technical, methodological, and literature review prompts for GPT-5.4 via Codex CLI, plus style guidance for Claude native review.
+Technical, methodological, and literature review prompts for GPT-5.5 via Codex CLI, plus style guidance for Claude native review.
 
 ## Usage
 
 ```bash
 # Technical or methodological review (high reasoning)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[PROMPT]"
 
 # Literature analysis for Introduction (Stage 1 of /radiology-intro)
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[LITERATURE PROMPT]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[LITERATURE PROMPT]"
 ```
 
 ---
@@ -592,14 +592,14 @@ Report compliance status for each item in JSON.
 
 ## Introduction Literature Analysis Prompt
 
-**Model:** GPT-5.4 via Codex CLI
+**Model:** GPT-5.5 via Codex CLI
 **Purpose:** Literature review and knowledge gap analysis for Introduction writing (Stage 1 of /radiology-intro).
-**Reasoning parameter:** `model_reasoning_effort=high`
+**Reasoning parameter:** `model_reasoning_effort=xhigh`
 
 **Invocation:**
 
 ```bash
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[PROMPT]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[PROMPT]"
 ```
 
 **Inputs:**
@@ -687,7 +687,7 @@ For each hint, provide:
     "paragraph_2_literature_and_gap": "Draft sentences for existing research and limitations with inline citation hints",
     "paragraph_3_objective": "Draft objective statement aligned to the identified gap"
   },
-  "source": "gpt-5.4"
+  "source": "gpt-5.5"
 }
 ```
 

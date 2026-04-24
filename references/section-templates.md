@@ -94,9 +94,9 @@
 - Study type (diagnostic_accuracy, prognostic, segmentation_ai)
 - Target journal
 
-**Step 2: Codex GPT-5.4 Literature Analysis (Stage 1)**
+**Step 2: Codex GPT-5.5 Literature Analysis (Stage 1)**
 ```bash
-codex exec -m gpt-5.4 --sandbox read-only --config model_reasoning_effort=high "[Introduction Literature Analysis prompt from references/codex-prompts.md]"
+codex exec -m gpt-5.5 --sandbox read-only --config model_reasoning_effort=xhigh "[Introduction Literature Analysis prompt from references/codex-prompts.md]"
 ```
 Output includes:
 - Prior work synthesis with citation hints
@@ -112,7 +112,7 @@ Output includes:
 - Integrate suggested citations
 
 **Step 4: Dual Review (Optional)**
-- GPT-5.4: Clinical relevance, gap clarity, objective alignment
+- GPT-5.5: Clinical relevance, gap clarity, objective alignment
 - Claude native: Flow, readability, citation integration
 
 ### Paragraph-Specific Guidelines
@@ -187,7 +187,7 @@ Output includes:
 | Prognostic | develop, validate, evaluate predictive value of |
 | Comparative | compare, assess superiority/noninferiority of |
 
-### Technical Review Criteria (GPT-5.4)
+### Technical Review Criteria (GPT-5.5)
 
 | Category | Check | Severity |
 |----------|-------|----------|
